@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Celestial Navigation</string>
+    <string name="empty_sight">Celestial Body and time not set.</string>
+    <string name="celestial_body_not_selected">Celestial Body not selected</string>
+    <string name="save_sight">Save Sight</string>
+    <string name="menu_back">Back</string>
+    <string name="add_sight">Add Sight</string>
 </resources>

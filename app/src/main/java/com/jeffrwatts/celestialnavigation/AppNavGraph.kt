@@ -83,9 +83,8 @@ fun AppNavGraph(
                 topBarTitle = R.string.add_sight,
                 //topBarTitle = entry.arguments?.getInt(SIGHT_TITLE_ARG)!!,
                 onSightUpdate = {
-                //    navActions.navigateToTasks(
-                //        if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
-                //    )
+                    navController.popBackStack()
+                    //navActions.navigateToSights()
                 },
                 onBack = { navController.popBackStack() }
             )

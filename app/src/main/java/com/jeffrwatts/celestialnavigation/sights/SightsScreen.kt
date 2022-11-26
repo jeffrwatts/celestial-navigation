@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -32,11 +29,11 @@ fun SightsScreen(
     onUserMessageDisplayed: () -> Unit,
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SightsViewModel = hiltViewModel(),
-    //scaffoldState: ScaffoldState = rememberScaffoldState()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    viewModel: SightsViewModel = hiltViewModel()
 ) {
     Scaffold(
-        //scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         topBar = {
             SightsTopAppBar(
                 openDrawer = openDrawer,
@@ -64,13 +61,13 @@ fun SightsScreen(
         )
 
         // Check for user messages to display on the screen
-        //uiState.userMessage?.let { message ->
-        //    val snackbarText = stringResource(message)
-        //    LaunchedEffect(scaffoldState, viewModel, message, snackbarText) {
-        //        scaffoldState.snackbarHostState.showSnackbar(snackbarText)
-        //        viewModel.snackbarMessageShown()
-        //    }
-        //}
+        uiState.userMessage?.let { message ->
+            val snackbarText = stringResource(message)
+            LaunchedEffect(viewModel, message, snackbarText) {
+                snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
 
         // Check if there's a userMessage to show to the user
         val currentOnUserMessageDisplayed by rememberUpdatedState(onUserMessageDisplayed)

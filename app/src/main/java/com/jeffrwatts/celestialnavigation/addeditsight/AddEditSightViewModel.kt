@@ -90,7 +90,7 @@ class AddEditSightViewModel @Inject constructor (
         }
         val currentTime = System.currentTimeMillis()
         val date = Date(currentTime)
-        val sdf = SimpleDateFormat("yyyyy/MM/dd hh:mm:ss", Locale.US)
+        val sdf = SimpleDateFormat("yyyy/MM/dd hh:mm:ss", Locale.US)
         val utc = sdf.format(date)
 
         _uiState.update {

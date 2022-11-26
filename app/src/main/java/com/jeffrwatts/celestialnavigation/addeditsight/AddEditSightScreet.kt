@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -28,7 +29,7 @@ fun AddEditSightScreen(
     onSightUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    //scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: AddEditSightViewModel = hiltViewModel()
 ) {
     Scaffold(
@@ -38,7 +39,8 @@ fun AddEditSightScreen(
             FloatingActionButton(onClick = viewModel::saveSight) {
                 Icon(Icons.Filled.Done, stringResource(id = R.string.save_sight))
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -59,13 +61,13 @@ fun AddEditSightScreen(
         }
 
         // Check for user messages to display on the screen
-        //uiState.userMessage?.let { userMessage ->
-        //    val snackbarText = stringResource(userMessage)
-        //    LaunchedEffect(scaffoldState, viewModel, userMessage, snackbarText) {
-        //        scaffoldState.snackbarHostState.showSnackbar(snackbarText)
-        //        viewModel.snackbarMessageShown()
-        //    }
-        //}
+        uiState.userMessage?.let { userMessage ->
+            val snackbarText = stringResource(userMessage)
+            LaunchedEffect(viewModel, userMessage, snackbarText) {
+                snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
     }
 }
 

@@ -5,4 +5,11 @@
     <string name="save_sight">Save Sight</string>
     <string name="menu_back">Back</string>
     <string name="add_sight">Add Sight</string>
+    <string name="loading_sights_error">Error loading sights</string>
+    <string name="successfully_saved_sight_message">Sight Saved</string>
+    <string name="successfully_added_sight_message">Sight Added</string>
+    <string name="successfully_deleted_sight_message">Sight Deleted</string>
+    <string name="label_all">All</string>
+    <string name="no_sights_all">No Sights</string>
+    <string name="open_drawer">Open</string>
 </resources>

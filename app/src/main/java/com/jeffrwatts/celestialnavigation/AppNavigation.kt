@@ -6,7 +6,7 @@ import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_TITLE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavScreens.ADD_EDIT_SIGHT_SCREEN
-import com.jeffrwatts.celestialnavigation.CelNavScreens.LOGS_SCREEN
+import com.jeffrwatts.celestialnavigation.CelNavScreens.SIGHTS_SCREEN
 import com.jeffrwatts.celestialnavigation.CelNavScreens.PLOT_SCREEN
 import com.jeffrwatts.celestialnavigation.CelNavScreens.SIGHT_DETAIL_SCREEN
 
@@ -15,7 +15,7 @@ import com.jeffrwatts.celestialnavigation.CelNavScreens.SIGHT_DETAIL_SCREEN
  */
 private object CelNavScreens {
     const val PLOT_SCREEN = "plot"
-    const val LOGS_SCREEN = "logs"
+    const val SIGHTS_SCREEN = "sights"
     const val SIGHT_DETAIL_SCREEN = "sight"
     const val ADD_EDIT_SIGHT_SCREEN = "addEditSight"
 }
@@ -34,7 +34,7 @@ object CelNavDestinationsArgs {
  */
 object CelNavDestinations {
     const val PLOT_ROUTE = PLOT_SCREEN
-    const val LOGS_ROUTE = LOGS_SCREEN
+    const val SIGHTS_ROUTE = SIGHTS_SCREEN
     const val SIGHT_DETAIL_ROUTE = "$SIGHT_DETAIL_SCREEN/{$SIGHT_ID_ARG}"
     const val ADD_EDIT_SIGHT_ROUTE = "$ADD_EDIT_SIGHT_SCREEN/{$SIGHT_TITLE_ARG}?$SIGHT_ID_ARG={$SIGHT_ID_ARG}"
 }
@@ -57,8 +57,8 @@ class AppNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToLogs() {
-        navController.navigate(CelNavDestinations.LOGS_ROUTE) {
+    fun navigateToSights() {
+        navController.navigate(CelNavDestinations.SIGHTS_ROUTE) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items

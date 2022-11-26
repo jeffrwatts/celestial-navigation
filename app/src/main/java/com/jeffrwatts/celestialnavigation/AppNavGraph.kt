@@ -21,6 +21,7 @@ import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_TITLE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
+import com.jeffrwatts.celestialnavigation.sights.SightsScreen
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +31,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    startDestination: String = CelNavDestinations.ADD_EDIT_SIGHT_ROUTE, // TODO: Replace with Plots.
+    startDestination: String = CelNavDestinations.SIGHTS_ROUTE, // TODO: Replace with Plots.
     navActions: AppNavigationActions = remember(navController) {
         AppNavigationActions(navController)
     }
@@ -59,7 +60,13 @@ fun AppNavGraph(
             //    )
             //}
         }
-        composable(CelNavDestinations.LOGS_ROUTE) {
+        composable(CelNavDestinations.SIGHTS_ROUTE) {
+            SightsScreen(
+                userMessage = R.string.app_name,
+                onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null)},
+                onSightClick = {},
+                onUserMessageDisplayed = {},
+                openDrawer = {})
             //AppModalDrawer(drawerState, currentRoute, navActions) {
             //    StatisticsScreen(openDrawer = { coroutineScope.launch { drawerState.open() } })
             //}

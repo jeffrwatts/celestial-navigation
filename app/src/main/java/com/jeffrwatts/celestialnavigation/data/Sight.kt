@@ -39,6 +39,6 @@ data class Sight @JvmOverloads constructor(
     @ColumnInfo(name = "lat") var lat: Double = 0.0,
     @ColumnInfo(name = "lon") var lon: Double = 0.0,
 
-    @ColumnInfo(name = "selected") var isSelected: Boolean = false,
+    @ColumnInfo(name = "activated") var isActive: Boolean = false,
     @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString())
 

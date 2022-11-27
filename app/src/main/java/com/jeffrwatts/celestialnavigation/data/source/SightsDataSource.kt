@@ -15,6 +15,8 @@ interface SightsDataSource {
 
     suspend fun saveSight(sight: Sight)
 
+    suspend fun activateSight(sight: Sight, activate: Boolean)
+
     suspend fun deleteAllSights()
 
     suspend fun deleteSight(sightId: String)

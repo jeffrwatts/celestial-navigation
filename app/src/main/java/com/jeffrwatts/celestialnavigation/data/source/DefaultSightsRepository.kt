@@ -46,6 +46,13 @@ class DefaultSightsRepository (
         }
     }
 
+    override suspend fun activateSight(sight: Sight, activate: Boolean) {
+        coroutineScope {
+            //launch { sightsRemoteDataSource.activateTask(sight, activate) }
+            launch { sightsLocalDataSource.activateSight(sight, activate) }
+        }
+    }
+
     override suspend fun deleteAllSights() {
         withContext(ioDispatcher) {
             coroutineScope {

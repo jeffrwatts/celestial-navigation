@@ -7,5 +7,10 @@ enum class SightsFilterType {
     /**
      * Do not filter tasks.
      */
-    ALL_SIGHTS
+    ALL_SIGHTS,
+
+    /**
+     * Filters only the active (not completed yet) tasks.
+     */
+    ACTIVE_SIGHTS
 }

@@ -16,11 +16,7 @@ import androidx.compose.ui.res.stringResource
 fun SightsTopAppBar(
     openDrawer: () -> Unit,
     onFilterAllSights: () -> Unit,
-    onFilterActiveSights: () -> Unit,
-    onFilterCompletedSights: () -> Unit,
-    onClearCompletedSights: () -> Unit,
-    onRefresh: () -> Unit
-) {
+    onFilterActiveSights: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         navigationIcon = {
@@ -28,10 +24,10 @@ fun SightsTopAppBar(
                 Icon(Icons.Filled.Menu, stringResource(id = R.string.open_drawer))
             }
         },
-        //actions = {
-        //    FilterTasksMenu(onFilterAllTasks, onFilterActiveTasks, onFilterCompletedTasks)
+        actions = {
+        //    FilterTasksMenu(onFilterAllSights, onFilterActiveSights)
         //    MoreTasksMenu(onClearCompletedTasks, onRefresh)
-        //},
+        },
         modifier = Modifier.fillMaxWidth()
     )
 }

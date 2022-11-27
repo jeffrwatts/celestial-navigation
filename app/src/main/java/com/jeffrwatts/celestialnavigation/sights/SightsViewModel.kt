@@ -8,13 +8,14 @@ import com.jeffrwatts.celestialnavigation.DELETE_RESULT_OK
 import com.jeffrwatts.celestialnavigation.EDIT_RESULT_OK
 import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.data.source.SightsRepository
-import com.jeffrwatts.celestialnavigation.utils.Async
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.jeffrwatts.celestialnavigation.data.Result
 import com.jeffrwatts.celestialnavigation.R
+import com.jeffrwatts.celestialnavigation.utils.Async
 import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed
+import kotlinx.coroutines.flow.*
 
 /**
  * UiState for the task list screen.
@@ -41,7 +42,7 @@ class SightsViewModel @Inject constructor(
     private val _filterUiInfo = _savedFilterType.map { getFilterUiInfo(it) }.distinctUntilChanged()
     private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
     private val _isLoading = MutableStateFlow(false)
-    private val _filteredTasksAsync =
+    private val _filteredSightsAsync =
         combine(sightsRepository.getSightsStream(), _savedFilterType) { sights, type ->
             filterSights(sights, type)
         }
@@ -49,7 +50,7 @@ class SightsViewModel @Inject constructor(
             .onStart<Async<List<Sight>>> { emit(Async.Loading) }
 
     val uiState: StateFlow<SightsUiState> = combine(
-        _filterUiInfo, _isLoading, _userMessage, _filteredTasksAsync
+        _filterUiInfo, _isLoading, _userMessage, _filteredSightsAsync
     ) { filterUiInfo, isLoading, userMessage, sightsAsync ->
         when (sightsAsync) {
             Async.Loading -> {
@@ -77,21 +78,20 @@ class SightsViewModel @Inject constructor(
 
     //fun clearCompletedTasks() {
     //    viewModelScope.launch {
-    //        tasksRepository.clearCompletedTasks()
+    //        sightsRepository.clearCompletedTasks()
     //        showSnackbarMessage(R.string.completed_tasks_cleared)
     //        refresh()
     //    }
     //}
 
-    //fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
-    //    if (completed) {
-    //        tasksRepository.completeTask(task)
-    //        showSnackbarMessage(R.string.task_marked_complete)
-    //    } else {
-    //        tasksRepository.activateTask(task)
-    //        showSnackbarMessage(R.string.task_marked_active)
-    //    }
-    //}
+    fun activateSight(sight: Sight, activated: Boolean) = viewModelScope.launch {
+        sightsRepository.activateSight(sight, activated)
+        if (activated) {
+            showSnackbarMessage(R.string.sight_marked_active)
+        } else {
+            showSnackbarMessage(R.string.sight_marked_inactive)
+        }
+    }
 
     fun showEditResultMessage(result: Int) {
         when (result) {
@@ -112,7 +112,7 @@ class SightsViewModel @Inject constructor(
     //fun refresh() {
     //    _isLoading.value = true
     //    viewModelScope.launch {
-    //        tasksRepository.refreshTasks()
+    //        sightsRepository.refreshTasks()
     //        _isLoading.value = false
     //    }
     //}
@@ -127,21 +127,18 @@ class SightsViewModel @Inject constructor(
         emptyList()
     }
 
-    private fun filterItems(tasks: List<Sight>, filteringType: SightsFilterType): List<Sight> {
-        val tasksToShow = ArrayList<Sight>()
+    private fun filterItems(sights: List<Sight>, filteringType: SightsFilterType): List<Sight> {
+        val sightsToShow = ArrayList<Sight>()
         // We filter the tasks based on the requestType
-        for (task in tasks) {
+        for (sight in sights) {
             when (filteringType) {
-                SightsFilterType.ALL_SIGHTS -> tasksToShow.add(task)
-                //ACTIVE_TASKS -> if (task.isActive) {
-                //    tasksToShow.add(task)
-                //}
-                //COMPLETED_TASKS -> if (task.isCompleted) {
-                //    tasksToShow.add(task)
-                //}
+                SightsFilterType.ALL_SIGHTS -> sightsToShow.add(sight)
+                SightsFilterType.ACTIVE_SIGHTS -> if (sight.isActive) {
+                    sightsToShow.add(sight)
+                }
             }
         }
-        return tasksToShow
+        return sightsToShow
     }
 
     private fun getFilterUiInfo(requestType: SightsFilterType): FilteringUiInfo =
@@ -149,21 +146,15 @@ class SightsViewModel @Inject constructor(
             SightsFilterType.ALL_SIGHTS -> {
                 FilteringUiInfo(
                     R.string.label_all, R.string.no_sights_all,
-                    //R.drawable.logo_no_fill
+                    R.drawable.logo_no_fill
                 )
             }
-            //ACTIVE_TASKS -> {
-            //    FilteringUiInfo(
-            //        R.string.label_active, R.string.no_tasks_active,
-            //        R.drawable.ic_check_circle_96dp
-            //    )
-            //}
-            //COMPLETED_TASKS -> {
-            //    FilteringUiInfo(
-            //        R.string.label_completed, R.string.no_tasks_completed,
-            //        R.drawable.ic_verified_user_96dp
-            //    )
-            //}
+            SightsFilterType.ACTIVE_SIGHTS -> {
+                FilteringUiInfo(
+                    R.string.label_active, R.string.no_sights_active,
+                    R.drawable.ic_check_circle_96dp
+                )
+            }
         }
 }
 
@@ -173,5 +164,5 @@ const val SIGHTS_FILTER_SAVED_STATE_KEY = "SIGHTS_FILTER_SAVED_STATE_KEY"
 data class FilteringUiInfo(
     val currentFilteringLabel: Int = R.string.label_all,
     val noTasksLabel: Int = R.string.no_sights_all,
-    //val noTaskIconRes: Int = R.drawable.logo_no_fill,
+    val noTaskIconRes: Int = R.drawable.logo_no_fill,
 )

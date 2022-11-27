@@ -29,8 +29,8 @@ fun AddEditSightScreen(
     onSightUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: AddEditSightViewModel = hiltViewModel()
+    viewModel: AddEditSightViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),

@@ -66,10 +66,10 @@ interface SightsDao {
      * Update the selected status of a sight
      *
      * @param sightId id of the sight
-     * @param selected status to be updated
+     * @param activated status to be updated
      */
-    @Query("UPDATE sights SET selected = :selected WHERE entryid = :sightId")
-    suspend fun updateSelected(sightId: String, selected: Boolean)
+    @Query("UPDATE sights SET activated = :selected WHERE entryid = :sightId")
+    suspend fun updateActivated(sightId: String, selected: Boolean)
 
     /**
      * Delete a sight by id.

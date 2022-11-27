@@ -2,6 +2,7 @@ package com.jeffrwatts.celestialnavigation.sights
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,14 +12,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jeffrwatts.celestialnavigation.SightsTopAppBar
 import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.R
+import com.jeffrwatts.celestialnavigation.SightsTopAppBar
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
+import com.jeffrwatts.celestialnavigation.utils.LoadingContent
 
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -29,19 +33,16 @@ fun SightsScreen(
     onUserMessageDisplayed: () -> Unit,
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    viewModel: SightsViewModel = hiltViewModel()
+    viewModel: SightsViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             SightsTopAppBar(
                 openDrawer = openDrawer,
                 onFilterAllSights = { viewModel.setFiltering(SightsFilterType.ALL_SIGHTS) },
-                onFilterActiveSights = { /*viewModel.setFiltering(ACTIVE_TASKS)*/ },
-                onFilterCompletedSights = { /*viewModel.setFiltering(COMPLETED_TASKS)*/ },
-                onClearCompletedSights = { /*viewModel.clearCompletedTasks()*/ },
-                onRefresh = { /*viewModel.refresh()*/ }
+                onFilterActiveSights = { viewModel.setFiltering(SightsFilterType.ACTIVE_SIGHTS) }
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -54,9 +55,13 @@ fun SightsScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         SightsContent(
+            loading = uiState.isLoading,
             sights = uiState.items,
             currentFilteringLabel = uiState.filteringUiInfo.currentFilteringLabel,
+            noSightsLabel = uiState.filteringUiInfo.noTasksLabel,
+            noSightsIconRes = uiState.filteringUiInfo.noTaskIconRes,
             onSightClick = onSightClick,
+            onSightActivatedChange = viewModel::activateSight,
             modifier = Modifier.padding(paddingValues)
         )
 
@@ -82,35 +87,52 @@ fun SightsScreen(
 
 @Composable
 private fun SightsContent(
+    loading: Boolean,
     sights: List<Sight>,
     @StringRes currentFilteringLabel: Int,
+    @StringRes noSightsLabel: Int,
+    @DrawableRes noSightsIconRes: Int,
     onSightClick: (Sight) -> Unit,
+    onSightActivatedChange: (Sight, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+    LoadingContent(
+        loading = loading,
+        empty = sights.isEmpty() && !loading,
+        emptyContent = { SightsEmptyContent(noSightsLabel, noSightsIconRes, modifier) },
+        onRefresh = {}
     ) {
-        Text(
-            text = stringResource(currentFilteringLabel),
-            modifier = Modifier.padding(
-                horizontal = dimensionResource(id = R.dimen.list_item_padding),
-                vertical = dimensionResource(id = R.dimen.vertical_margin)
-            ),
-            style = Typography.bodyLarge
-        )
-
-        for (sight in sights) {
-            SightItem(sight, onSightClick)
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+        ) {
+            Text(
+                text = stringResource(currentFilteringLabel),
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(id = R.dimen.list_item_padding),
+                    vertical = dimensionResource(id = R.dimen.vertical_margin)
+                ),
+                style = Typography.bodyLarge
+            )
+            Column {
+                for (sight in sights)
+                    SightItem(
+                        sight = sight,
+                        onTaskClick = onSightClick,
+                        onCheckedChange = { onSightActivatedChange(sight, it) }
+                    )
+                }
+            }
         }
     }
-}
+
 
 @Composable
 private fun SightItem(
     sight: Sight,
-    onSightClick: (Sight) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    onTaskClick: (Sight) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -120,8 +142,12 @@ private fun SightItem(
                 horizontal = dimensionResource(id = R.dimen.horizontal_margin),
                 vertical = dimensionResource(id = R.dimen.list_item_padding),
             )
-            .clickable { onSightClick(sight) }
+            .clickable { onTaskClick(sight) }
     ) {
+        Checkbox(
+            checked = sight.isActive,
+            onCheckedChange = onCheckedChange
+        )
         Text(
             text = "${sight.celestialBody} at ${sight.utc}",
             style = Typography.bodyLarge,
@@ -129,5 +155,25 @@ private fun SightItem(
                 start = dimensionResource(id = R.dimen.horizontal_margin)
             )
         )
+    }
+}
+
+@Composable
+private fun SightsEmptyContent(
+    @StringRes noTasksLabel: Int,
+    @DrawableRes noTasksIconRes: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = noTasksIconRes),
+            contentDescription = stringResource(R.string.no_sights_image_content_description),
+            modifier = Modifier.size(96.dp)
+        )
+        Text(stringResource(id = noTasksLabel))
     }
 }

@@ -46,8 +46,13 @@ class SightsLocalDataSource internal constructor(
         }
     }
 
+
     override suspend fun saveSight(sight: Sight) {
         sightsDao.insertSight(sight)
+    }
+
+    override suspend fun activateSight(sight: Sight, activate: Boolean) {
+        sightsDao.updateActivated(sight.id, activate)
     }
 
     override suspend fun deleteAllSights() {

@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
 import kotlin.math.pow
 
@@ -183,5 +185,26 @@ fun Intercept (intercept: Double, direction: CelNavUtils.LOPDirection) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "a:", style = Typography.titleLarge)
         Text(text = "$intercept nm; ${if (direction == CelNavUtils.LOPDirection.Away) "Away" else "Towards"}", style = Typography.bodyLarge)
+    }
+}
+
+@Composable
+fun LoadingContent(
+    loading: Boolean,
+    empty: Boolean,
+    emptyContent: @Composable () -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    if (empty) {
+        emptyContent()
+    } else {
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(loading),
+            onRefresh = onRefresh,
+            modifier = modifier,
+            content = content,
+        )
     }
 }

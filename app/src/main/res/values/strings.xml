@@ -12,4 +12,14 @@
     <string name="label_all">All</string>
     <string name="no_sights_all">No Sights</string>
     <string name="open_drawer">Open</string>
+    <string name="edit_sight">Edit Sight</string>
+    <string name="navigation_view_header_title">Celestial Navigation</string>
+    <string name="sights_header_image_content_description">Sights header image</string>
+    <string name="list_title">Sights List</string>
+    <string name="plot_title">Plot</string>
+    <string name="sight_marked_active">Sight Activated</string>
+    <string name="sight_marked_inactive">Sight inactive</string>
+    <string name="label_active">Active</string>
+    <string name="no_sights_active">No Sights Active</string>
+    <string name="no_sights_image_content_description">No Sights</string>
 </resources>

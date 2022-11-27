@@ -30,46 +30,30 @@ fun AppModalDrawer(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            AppDrawer(
-                currentRoute = currentRoute,
-                navigateToTasks = { navigationActions.navigateToSights() },
-                navigateToStatistics = { navigationActions.navigateToPlot() },
-                closeDrawer = { coroutineScope.launch { drawerState.close() } }
-            )
+            ModalDrawerSheet() {
+                DrawerHeader()
+                DrawerButton(
+                    painter = painterResource(id = R.drawable.ic_list),
+                    label = stringResource(id = R.string.list_title),
+                    isSelected = currentRoute == CelNavDestinations.SIGHTS_ROUTE,
+                    action = {
+                        navigationActions.navigateToSights()
+                        coroutineScope.launch { drawerState.close() }
+                    }
+                )
+                DrawerButton(
+                    painter = painterResource(id = R.drawable.ic_plot),
+                    label = stringResource(id = R.string.plot_title),
+                    isSelected = currentRoute == CelNavDestinations.PLOT_ROUTE,
+                    action = {
+                        navigationActions.navigateToPlot()
+                        coroutineScope.launch { drawerState.close() }
+                    }
+                )
+            }
         }
     ) {
         content()
-    }
-}
-
-@Composable
-private fun AppDrawer(
-    currentRoute: String,
-    navigateToTasks: () -> Unit,
-    navigateToStatistics: () -> Unit,
-    closeDrawer: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxSize()) {
-        DrawerHeader()
-        DrawerButton(
-            painter = painterResource(id = R.drawable.ic_list),
-            label = stringResource(id = R.string.list_title),
-            isSelected = currentRoute == CelNavDestinations.SIGHTS_ROUTE,
-            action = {
-                navigateToTasks()
-                closeDrawer()
-            }
-        )
-        DrawerButton(
-            painter = painterResource(id = R.drawable.ic_plot),
-            label = stringResource(id = R.string.plot_title),
-            isSelected = currentRoute == CelNavDestinations.PLOT_ROUTE,
-            action = {
-                navigateToStatistics()
-                closeDrawer()
-            }
-        )
     }
 }
 

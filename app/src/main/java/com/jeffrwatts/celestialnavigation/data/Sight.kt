@@ -39,6 +39,18 @@ data class Sight @JvmOverloads constructor(
     @ColumnInfo(name = "lat") var lat: Double = 0.0,
     @ColumnInfo(name = "lon") var lon: Double = 0.0,
 
+    // Sight Reduction Values
+    @ColumnInfo(name = "dip") var dip: Double = 0.0,
+    @ColumnInfo(name = "refraction") var refraction: Double = 0.0,
+    @ColumnInfo(name = "SD") var SD: Double = 0.0,
+    @ColumnInfo(name = "HP") var HP: Double = 0.0,
+    @ColumnInfo(name = "Ho") var Ho: Double = 0.0,
+    @ColumnInfo(name = "lha") var lha: Double = 0.0,
+    @ColumnInfo(name = "Hc") var Hc: Double = 0.0,
+    @ColumnInfo(name = "Zn") var Zn: Double = 0.0,
+    @ColumnInfo(name = "lopDirection") var lopDirection: CelNavUtils.LOPDirection = CelNavUtils.LOPDirection.Towards,
+    @ColumnInfo(name = "intercept") var intercept: Double = 0.0,
+
     @ColumnInfo(name = "activated") var isActive: Boolean = false,
     @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString())
 

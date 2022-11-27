@@ -241,7 +241,17 @@ class AddEditSightViewModel @Inject constructor (
             Hs = uiState.value.Hs,
             ic = uiState.value.ic,
             eyeHeight = uiState.value.eyeHeight,
-            limb = uiState.value.limb)
+            limb = uiState.value.limb,
+            dip = uiState.value.dip,
+            refraction = uiState.value.refraction,
+            SD = uiState.value.SD,
+            HP = uiState.value.HP,
+            Ho = uiState.value.Ho,
+            lha = uiState.value.lha,
+            Hc = uiState.value.Hc,
+            Zn = uiState.value.Zn,
+            lopDirection = uiState.value.lopDirection,
+            intercept = uiState.value.intercept)
         sightsRepository.saveSight(newSight)
         _uiState.update {
             it.copy(isSightSaved = true)
@@ -265,7 +275,17 @@ class AddEditSightViewModel @Inject constructor (
                 Hs = uiState.value.Hs,
                 ic = uiState.value.ic,
                 eyeHeight = uiState.value.eyeHeight,
-                limb = uiState.value.limb)
+                limb = uiState.value.limb,
+                dip = uiState.value.dip,
+                refraction = uiState.value.refraction,
+                SD = uiState.value.SD,
+                HP = uiState.value.HP,
+                Ho = uiState.value.Ho,
+                lha = uiState.value.lha,
+                Hc = uiState.value.Hc,
+                Zn = uiState.value.Zn,
+                lopDirection = uiState.value.lopDirection,
+                intercept = uiState.value.intercept)
             sightsRepository.saveSight(updatedSight)
             _uiState.update {
                 it.copy(isSightSaved = true)
@@ -295,6 +315,16 @@ class AddEditSightViewModel @Inject constructor (
                             ic = sight.ic,
                             limb = sight.limb,
                             eyeHeight = sight.eyeHeight,
+                            dip = sight.dip,
+                            refraction = sight.refraction,
+                            SD = sight.SD,
+                            HP = sight.HP,
+                            Ho = sight.Ho,
+                            lha = sight.lha,
+                            Hc = sight.Hc,
+                            Zn = sight.Zn,
+                            lopDirection = sight.lopDirection,
+                            intercept = sight.intercept,
                             isLoading = false
                         )
                     }

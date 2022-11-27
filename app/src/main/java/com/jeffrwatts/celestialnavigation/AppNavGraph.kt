@@ -21,6 +21,7 @@ import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.TITLE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
+import com.jeffrwatts.celestialnavigation.plotting.PlotScreen
 import com.jeffrwatts.celestialnavigation.sights.SightsScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -62,9 +63,11 @@ fun AppNavGraph(
             }
         }
         composable(CelNavDestinations.PLOT_ROUTE) {
-            //AppModalDrawer(drawerState, currentRoute, navActions) {
-            //    StatisticsScreen(openDrawer = { coroutineScope.launch { drawerState.open() } })
-            //}
+            AppModalDrawer(drawerState, currentRoute, navActions) {
+                PlotScreen(
+                    onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
+                    openDrawer = { coroutineScope.launch { drawerState.open() } })
+            }
         }
         composable(
             CelNavDestinations.ADD_EDIT_SIGHT_ROUTE,

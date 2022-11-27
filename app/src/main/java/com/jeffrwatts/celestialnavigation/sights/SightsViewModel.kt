@@ -18,7 +18,7 @@ import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed
 import kotlinx.coroutines.flow.*
 
 /**
- * UiState for the task list screen.
+ * UiState for the sight list screen.
  */
 data class SightsUiState(
     val items: List<Sight> = emptyList(),
@@ -76,14 +76,6 @@ class SightsViewModel @Inject constructor(
         savedStateHandle[SIGHTS_FILTER_SAVED_STATE_KEY] = requestType
     }
 
-    //fun clearCompletedTasks() {
-    //    viewModelScope.launch {
-    //        sightsRepository.clearCompletedTasks()
-    //        showSnackbarMessage(R.string.completed_tasks_cleared)
-    //        refresh()
-    //    }
-    //}
-
     fun activateSight(sight: Sight, activated: Boolean) = viewModelScope.launch {
         sightsRepository.activateSight(sight, activated)
         if (activated) {
@@ -108,14 +100,6 @@ class SightsViewModel @Inject constructor(
     private fun showSnackbarMessage(message: Int) {
         _userMessage.value = message
     }
-
-    //fun refresh() {
-    //    _isLoading.value = true
-    //    viewModelScope.launch {
-    //        sightsRepository.refreshTasks()
-    //        _isLoading.value = false
-    //    }
-    //}
 
     private fun filterSights(
         sightsResult: Result<List<Sight>>,

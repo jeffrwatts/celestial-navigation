@@ -34,6 +34,21 @@ fun SightsTopAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun PlotTopAppBar(
+    openDrawer: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = R.string.plot_title)) },
+        navigationIcon = {
+            IconButton(onClick = openDrawer) {
+                Icon(Icons.Filled.Menu, stringResource(id = R.string.open_drawer))
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun AddEditSightTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(title)) },

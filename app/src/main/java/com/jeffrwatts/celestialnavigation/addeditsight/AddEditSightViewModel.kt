@@ -98,24 +98,22 @@ class AddEditSightViewModel @Inject constructor (
         }
 
         // TODO Request sight data from server.  For now two hardcoded values.
-        if (uiState.value.celestialBody == "Altair") {
+        if (celestialBody == "Altair") {
             _uiState.update {
                 it.copy(
                     gha = CelNavUtils.altairGHA,
                     dec = CelNavUtils.altairDec,
                     distance = CelNavUtils.altairDistance,
-                    utc = CelNavUtils.utc,
                     hasGP = true
                 )
             }
             doSightReduction()
-        } else if (uiState.value.celestialBody == "Antares") {
+        } else if (celestialBody == "Antares") {
             _uiState.update {
                 it.copy(
                     gha = CelNavUtils.antaresGHA,
                     dec = CelNavUtils.antaresDec,
                     distance = CelNavUtils.antaresDistance,
-                    utc = CelNavUtils.utc,
                     hasGP = true
                 )
             }

@@ -40,18 +40,32 @@ fun AddEditSightScreen(
                 Icon(Icons.Filled.Done, stringResource(id = R.string.save_sight))
             }
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState)}
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        AddEditSightContent(uiState,
-            onGetGeographicalPosition = viewModel::getGeographicalPosition,
+        AddEditSightContent(
+            uiState,
+            onGetGeographicalPosition = { celestialBody->
+                viewModel.getGeographicalPosition(celestialBody)
+                // TOOD REMOVE.
+                if (celestialBody == "Antares") {
+                    viewModel.setHs(CelNavUtils.antaresHs)
+                    viewModel.setLat(CelNavUtils.drLat)
+                    viewModel.setLon(CelNavUtils.drLon)
+                } else if (celestialBody == "Altair") {
+                    viewModel.setHs(CelNavUtils.altairHs)
+                    viewModel.setLat(CelNavUtils.drLat)
+                    viewModel.setLon(CelNavUtils.drLon)
+                }
+            },
             onHsChanged = viewModel::setHs,
             onIcChanged = viewModel::setIc,
             onEyeHeightChanged = viewModel::setEyeHeight,
             onLatChanged = viewModel::setLat,
             onLonChanged = viewModel::setLon,
-            modifier = Modifier.padding(paddingValues))
+            modifier = Modifier.padding(paddingValues)
+        )
 
         // Check if the task is saved and call onTaskUpdate event
         LaunchedEffect(uiState.isSightSaved) {
@@ -96,25 +110,8 @@ private fun AddEditSightContent(
                 .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
                 .verticalScroll(rememberScrollState())
         ) {
-            Row() {
-                Button(onClick = {
-                    onGetGeographicalPosition("Antares")
-                    onHsChanged(CelNavUtils.antaresHs)
-                    onLatChanged(CelNavUtils.drLat)
-                    onLonChanged(CelNavUtils.drLon)
-                }) {
-                    Text("Antares GP")
-                }
-                Button(onClick = {
-                    onGetGeographicalPosition("Altair")
-                    onHsChanged(CelNavUtils.altairHs)
-                    onLatChanged(CelNavUtils.drLat)
-                    onLonChanged(CelNavUtils.drLon)
-                }) {
-                    Text("Altair GP")
-                }
-            }
-
+            CelestialBodyDropDown ( onGetGeographicalPosition )
+            UTC(uiState.utc)
             AngleDisplay(label = "GHA:", angle = uiState.gha)
             Dec(angle = uiState.dec)
             Divider(thickness = 2.dp)

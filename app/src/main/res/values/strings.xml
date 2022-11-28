@@ -22,4 +22,72 @@
     <string name="label_active">Active</string>
     <string name="no_sights_active">No Sights Active</string>
     <string name="no_sights_image_content_description">No Sights</string>
+
+    <string-array name="celestial_bodies">
+        <item>Sun</item>
+        <item>Moon</item>
+        <item>Venus</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Antares</item>
+        <item>Altair</item>
+        <item>Alpheratz</item>
+        <item>Ankaa</item>
+        <item>Schedar</item>
+        <item>Diphda</item>
+        <item>Achernar</item>
+        <item>Hamal</item>
+        <item>Polaris</item>
+        <item>Acamar</item>
+        <item>Menkar</item>
+        <item>Mirfak</item>
+        <item>Aldebaran</item>
+        <item>Rigel</item>
+        <item>Capella</item>
+        <item>Bellatrix</item>
+        <item>Elnath</item>
+        <item>Alnilam</item>
+        <item>Betelgeuse</item>
+        <item>Canopus</item>
+        <item>Sirius</item>
+        <item>Adhara</item>
+        <item>Procyon</item>
+        <item>Pollux</item>
+        <item>Avior</item>
+        <item>Suhail</item>
+        <item>Miaplacidus</item>
+        <item>Alphard</item>
+        <item>Regulus</item>
+        <item>Dubhe</item>
+        <item>Denebola</item>
+        <item>Gienah</item>
+        <item>Acrux</item>
+        <item>Gacrux</item>
+        <item>Alioth</item>
+        <item>Spica</item>
+        <item>Alkaid</item>
+        <item>Hadar</item>
+        <item>Menkent</item>
+        <item>Arcturus</item>
+        <item>Rigil Kent.</item>
+        <item>Kochab</item>
+        <item>Zuben\'ubi</item>
+        <item>Alphecca</item>
+        <item>Atria</item>
+        <item>Sabik</item>
+        <item>Shaula</item>
+        <item>Rasalhague</item>
+        <item>Eltanin</item>
+        <item>Kaus Aust.</item>
+        <item>Vega</item>
+        <item>Nunki</item>
+        <item>Peacock</item>
+        <item>Deneb</item>
+        <item>Enif</item>
+        <item>Al Na\'ir</item>
+        <item>Fomalhaut</item>
+        <item>Scheat</item>
+        <item>Markab</item>
+    </string-array>
 </resources>

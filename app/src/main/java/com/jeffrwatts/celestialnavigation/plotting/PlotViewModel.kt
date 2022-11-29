@@ -52,8 +52,8 @@ data class SightLineOfPosition(val sight: Sight) {
 data class PlotUiState(
     val items: List<SightLineOfPosition> = emptyList(),
     val isLoading: Boolean = false,
-    val filteringUiInfo: FilteringUiInfo = FilteringUiInfo(),
-    val userMessage: Int? = null
+    val assumedPosition: LatLng? = null,
+    val fix: LatLng? = null
 )
 
 @HiltViewModel
@@ -61,30 +61,21 @@ class PlotViewModel @Inject constructor(
     private val sightsRepository: SightsRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<PlotUiState> =
-        sightsRepository.getSightsStream()
-            .map { Async.Success(it) }
-            .onStart<Async<Result<List<Sight>>>> { emit(Async.Loading) }
-            .map { sightsAsync -> produceLineOfPosition(sightsAsync) }
-            .stateIn(
-                scope = viewModelScope,
-                started = WhileUiSubscribed,
-                initialValue = PlotUiState(isLoading = true)
-            )
 
-    fun clearAllSights () {
-        viewModelScope.launch {
-            sightsRepository.deleteAllSights()
-        }
-    }
+    private val _fix: MutableStateFlow<LatLng?> = MutableStateFlow(null)
+    private val _assumedPosition: MutableStateFlow<LatLng?> = MutableStateFlow(null)
+    private val _sightsAsync = sightsRepository.getSightsStream()
+        .map { Async.Success(it) }
+        .onStart<Async<Result<List<Sight>>>> { emit(Async.Loading) }
 
-    private fun produceLineOfPosition(sightsLoad: Async<Result<List<Sight>>>) =
-        when (sightsLoad) {
+    val uiState: StateFlow<PlotUiState> = combine(_assumedPosition, _fix, _sightsAsync) {
+            assumedPosition, fix, sightsAsync ->
+        when (sightsAsync) {
             Async.Loading -> {
                 PlotUiState(isLoading = true)
             }
             is Async.Success -> {
-                when (val result = sightsLoad.data) {
+                when (val result = sightsAsync.data) {
                     is Result.Success -> {
                         val lopFromSights = ArrayList<SightLineOfPosition>()
 
@@ -93,11 +84,32 @@ class PlotViewModel @Inject constructor(
                         }
                         PlotUiState(
                             items = lopFromSights,
-                            isLoading = false
+                            isLoading = false,
+                            assumedPosition = assumedPosition,
+                            fix = fix
                         )
                     }
                     else -> PlotUiState(isLoading = false)
                 }
             }
         }
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileUiSubscribed,
+            initialValue = PlotUiState(isLoading = true)
+        )
+    fun setFix(fix: LatLng) {
+        _fix.value = fix
+    }
+
+    fun setAssumedPosition(assumedPosition: LatLng) {
+        _assumedPosition.value = assumedPosition
+    }
+
+    fun clearAllSights () {
+        viewModelScope.launch {
+            sightsRepository.deleteAllSights()
+        }
+    }
 }

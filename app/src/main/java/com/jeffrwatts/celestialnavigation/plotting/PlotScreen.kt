@@ -59,7 +59,8 @@ fun PlotScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+            onMapLongClick = { viewModel.setFix(it)}
         )
         {
             if (!uiState.isLoading) {
@@ -84,6 +85,20 @@ fun PlotScreen(
                 if (uiState.items.isNotEmpty()) {
                     cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 64))
                 }
+            }
+
+            uiState.assumedPosition?.let { assumedPosition->
+                Marker(
+                    state = MarkerState(position = assumedPosition) ,
+                    title = "AP: ${displayLatLng(assumedPosition)}"
+                )
+            }
+
+            uiState.fix?.let { fix->
+                Marker(
+                    state = MarkerState(position = fix) ,
+                    title = "FIX: ${displayLatLng(fix)}"
+                )
             }
         }
     }

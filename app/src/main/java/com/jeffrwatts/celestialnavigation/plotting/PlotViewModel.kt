@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.jeffrwatts.celestialnavigation.data.Result
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 
 data class SightLineOfPosition(val sight: Sight) {
@@ -70,22 +71,11 @@ class PlotViewModel @Inject constructor(
                 started = WhileUiSubscribed,
                 initialValue = PlotUiState(isLoading = true)
             )
-    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
 
-    fun showEditResultMessage(result: Int) {
-        when (result) {
-            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_sight_message)
-            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_sight_message)
-            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_sight_message)
+    fun clearAllSights () {
+        viewModelScope.launch {
+            sightsRepository.deleteAllSights()
         }
-    }
-
-    fun snackbarMessageShown() {
-        _userMessage.value = null
-    }
-
-    private fun showSnackbarMessage(message: Int) {
-        _userMessage.value = message
     }
 
     private fun produceLineOfPosition(sightsLoad: Async<Result<List<Sight>>>) =

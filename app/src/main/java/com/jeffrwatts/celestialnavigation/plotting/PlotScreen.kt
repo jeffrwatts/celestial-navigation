@@ -27,7 +27,6 @@ import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 fun PlotScreen(
     onAddSight: () -> Unit,
     onEditSights: () -> Unit,
-    onClearSights: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlotViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -37,7 +36,7 @@ fun PlotScreen(
         topBar = {
             PlotTopAppBar(
                 onEditSights = onEditSights,
-                onClearSights = onClearSights)
+                onClearSights = viewModel::clearAllSights)
         },
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {

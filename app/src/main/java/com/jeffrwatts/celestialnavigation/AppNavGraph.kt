@@ -50,8 +50,7 @@ fun AppNavGraph(
             CelNavDestinations.PLOT_ROUTE) {
             PlotScreen(
                 onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                onEditSights = { navActions.navigateToSights() },
-                onClearSights = {})
+                onEditSights = { navActions.navigateToSights() })
         }
         composable(
             CelNavDestinations.ADD_EDIT_SIGHT_ROUTE,

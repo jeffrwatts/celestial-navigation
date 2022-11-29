@@ -22,6 +22,10 @@
     <string name="label_active">Active</string>
     <string name="no_sights_active">No Sights Active</string>
     <string name="no_sights_image_content_description">No Sights</string>
+    <string name="menu_more">More</string>
+    <string name="clear_sights">Clear Sights</string>
+    <string name="edit_sights">Edit Sights</string>
+    <string name="sights">All Sights</string>
 
     <string-array name="celestial_bodies">
         <item>Sun</item>

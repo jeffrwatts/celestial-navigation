@@ -1,5 +1,6 @@
 package com.jeffrwatts.celestialnavigation.plotting
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,8 +25,11 @@ import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlotScreen(
+    @StringRes userMessage: Int,
     onAddSight: () -> Unit,
-    openDrawer: () -> Unit,
+    onEditSights: () -> Unit,
+    onClearSights: () -> Unit,
+    onUserMessageDisplayed: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlotViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -34,15 +38,16 @@ fun PlotScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             PlotTopAppBar(
-                openDrawer = openDrawer
-            )
+                onEditSights = onEditSights,
+                onClearSights = onClearSights)
         },
         modifier = modifier.fillMaxSize(),
-        //floatingActionButton = {
-        //    FloatingActionButton(onClick = onAddSight) {
-        //        Icon(Icons.Filled.Add, stringResource(id = R.string.add_sight))
-        //    }
-        //}
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddSight) {
+                Icon(Icons.Filled.Add, stringResource(id = R.string.add_sight))
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -82,6 +87,24 @@ fun PlotScreen(
                 if (uiState.items.isNotEmpty()) {
                     cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 64))
                 }
+            }
+        }
+
+        // Check for user messages to display on the screen
+        uiState.userMessage?.let { message ->
+            val snackbarText = stringResource(message)
+            LaunchedEffect(viewModel, message, snackbarText) {
+                snackbarHostState.showSnackbar(snackbarText)
+                viewModel.snackbarMessageShown()
+            }
+        }
+
+        // Check if there's a userMessage to show to the user
+        val currentOnUserMessageDisplayed by rememberUpdatedState(onUserMessageDisplayed)
+        LaunchedEffect(userMessage) {
+            if (userMessage != 0) {
+                viewModel.showEditResultMessage(userMessage)
+                currentOnUserMessageDisplayed()
             }
         }
     }

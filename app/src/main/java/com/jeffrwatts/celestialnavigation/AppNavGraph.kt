@@ -33,7 +33,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    startDestination: String = CelNavDestinations.SIGHTS_ROUTE,
+    startDestination: String = CelNavDestinations.PLOT_ROUTE,
     navActions: AppNavigationActions = remember(navController) {
         AppNavigationActions(navController)
     }
@@ -52,22 +52,25 @@ fun AppNavGraph(
                 navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
             )
         ) { entry ->
-            AppModalDrawer(drawerState, currentRoute, navActions) {
-                SightsScreen(
-                    userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
-                    onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
-                    onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                    onSightClick = { sight -> navActions.navigateToSightDetail(sight.id) },
-                    openDrawer = { coroutineScope.launch { drawerState.open() } }
-                )
-            }
+            SightsScreen(
+                userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
+                onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
+                onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
+                onSightClick = { sight -> navActions.navigateToSightDetail(sight.id) },
+                onBack = { navController.popBackStack() }
+            )
         }
-        composable(CelNavDestinations.PLOT_ROUTE) {
-            AppModalDrawer(drawerState, currentRoute, navActions) {
-                PlotScreen(
-                    onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                    openDrawer = { coroutineScope.launch { drawerState.open() } })
-            }
+        composable(
+            CelNavDestinations.PLOT_ROUTE,
+            arguments = listOf(
+                navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
+            )) { entry ->
+            PlotScreen(
+                userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
+                onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
+                onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
+                onEditSights = { navActions.navigateToSights() },
+                onClearSights = {})
         }
         composable(
             CelNavDestinations.ADD_EDIT_SIGHT_ROUTE,
@@ -80,7 +83,7 @@ fun AppNavGraph(
             AddEditSightScreen(
                 topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
                 onSightUpdate = {
-                    navActions.navigateToSights(
+                    navActions.navigateToPlot(
                         if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
                     )
                 },

@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,7 +33,7 @@ fun SightsScreen(
     onAddSight: () -> Unit,
     onSightClick: (Sight) -> Unit,
     onUserMessageDisplayed: () -> Unit,
-    openDrawer: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SightsViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -40,9 +42,7 @@ fun SightsScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             SightsTopAppBar(
-                openDrawer = openDrawer,
-                onFilterAllSights = { viewModel.setFiltering(SightsFilterType.ALL_SIGHTS) },
-                onFilterActiveSights = { viewModel.setFiltering(SightsFilterType.ACTIVE_SIGHTS) }
+                onBack = onBack
             )
         },
         modifier = modifier.fillMaxSize(),
@@ -50,7 +50,8 @@ fun SightsScreen(
             FloatingActionButton(onClick = onAddSight) {
                 Icon(Icons.Filled.Add, stringResource(id = R.string.add_sight))
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

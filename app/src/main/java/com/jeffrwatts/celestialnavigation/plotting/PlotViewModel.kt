@@ -3,6 +3,10 @@ package com.jeffrwatts.celestialnavigation.plotting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.jeffrwatts.celestialnavigation.ADD_EDIT_RESULT_OK
+import com.jeffrwatts.celestialnavigation.DELETE_RESULT_OK
+import com.jeffrwatts.celestialnavigation.EDIT_RESULT_OK
+import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.data.source.SightsRepository
 import com.jeffrwatts.celestialnavigation.sights.FilteringUiInfo
@@ -10,12 +14,9 @@ import com.jeffrwatts.celestialnavigation.utils.Async
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 import com.jeffrwatts.celestialnavigation.data.Result
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 
 
 data class SightLineOfPosition(val sight: Sight) {
@@ -69,6 +70,23 @@ class PlotViewModel @Inject constructor(
                 started = WhileUiSubscribed,
                 initialValue = PlotUiState(isLoading = true)
             )
+    private val _userMessage: MutableStateFlow<Int?> = MutableStateFlow(null)
+
+    fun showEditResultMessage(result: Int) {
+        when (result) {
+            EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_sight_message)
+            ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_sight_message)
+            DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_sight_message)
+        }
+    }
+
+    fun snackbarMessageShown() {
+        _userMessage.value = null
+    }
+
+    private fun showSnackbarMessage(message: Int) {
+        _userMessage.value = message
+    }
 
     private fun produceLineOfPosition(sightsLoad: Async<Result<List<Sight>>>) =
         when (sightsLoad) {

@@ -60,19 +60,26 @@ class AppNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToPlot() {
-        navController.navigate(CelNavDestinations.PLOT_ROUTE) {
+    fun navigateToPlot(userMessage: Int = 0) {
+        val navigatesFromDrawer = userMessage == 0
+
+        navController.navigate(
+            PLOT_SCREEN.let {
+                if (userMessage != 0) "$it?$USER_MESSAGE_ARG=$userMessage" else it
+            }
+        ) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
             popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
+                inclusive = !navigatesFromDrawer
+                saveState = navigatesFromDrawer
             }
             // Avoid multiple copies of the same destination when
             // reselecting the same item
             launchSingleTop = true
             // Restore state when reselecting a previously selected item
-            restoreState = true
+            restoreState = navigatesFromDrawer
         }
     }
 

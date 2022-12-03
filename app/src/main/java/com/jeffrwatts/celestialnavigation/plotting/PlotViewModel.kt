@@ -59,33 +59,29 @@ class PlotViewModel @Inject constructor(
 
     private val _fix: MutableStateFlow<LatLng?> = MutableStateFlow(null)
     private val _assumedPosition: MutableStateFlow<LatLng?> = MutableStateFlow(null)
-    private val _sightsAsync = sightsRepository.getSightsStream()
-        .map { Async.Success(it) }
-        .onStart<Async<Result<List<Sight>>>> { emit(Async.Loading) }
 
-    val uiState: StateFlow<PlotUiState> = combine(_assumedPosition, _fix, _sightsAsync) {
+    private val _activeSightsAsync = sightsRepository.getSightsStream()
+        .map { Async.Success(filterSights(if(it is Result.Success) it.data else emptyList())) }
+        .onStart<Async<List<Sight>>> { emit(Async.Loading) }
+
+    val uiState: StateFlow<PlotUiState> = combine(_assumedPosition, _fix, _activeSightsAsync) {
             assumedPosition, fix, sightsAsync ->
         when (sightsAsync) {
             Async.Loading -> {
                 PlotUiState(isLoading = true)
             }
             is Async.Success -> {
-                when (val result = sightsAsync.data) {
-                    is Result.Success -> {
-                        val lopFromSights = ArrayList<SightLineOfPosition>()
+                    val lopFromSights = ArrayList<SightLineOfPosition>()
 
-                        for (sight in result.data) {
-                            lopFromSights.add(SightLineOfPosition(sight))
-                        }
-                        PlotUiState(
-                            items = lopFromSights,
-                            isLoading = false,
-                            assumedPosition = assumedPosition,
-                            fix = fix
-                        )
+                    for (sight in sightsAsync.data) {
+                        lopFromSights.add(SightLineOfPosition(sight))
                     }
-                    else -> PlotUiState(isLoading = false)
-                }
+                    PlotUiState(
+                        items = lopFromSights,
+                        isLoading = false,
+                        assumedPosition = assumedPosition,
+                        fix = fix
+                    )
             }
         }
     }
@@ -94,6 +90,7 @@ class PlotViewModel @Inject constructor(
             started = WhileUiSubscribed,
             initialValue = PlotUiState(isLoading = true)
         )
+
     fun setFix(fix: LatLng) {
         _fix.value = fix
     }
@@ -106,5 +103,15 @@ class PlotViewModel @Inject constructor(
         viewModelScope.launch {
             sightsRepository.deleteAllSights()
         }
+    }
+
+    private fun filterSights(sights: List<Sight>): List<Sight> {
+        val sightsToPlot = ArrayList<Sight>()
+        for (sight in sights) {
+            if (sight.isActive) {
+                sightsToPlot.add(sight)
+            }
+        }
+        return sightsToPlot
     }
 }

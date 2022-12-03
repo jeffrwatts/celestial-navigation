@@ -89,6 +89,11 @@ class AddEditSightViewModel @Inject constructor (
         viewModelScope.launch {
             when (val geoPositionResult = geoPositionRepository.getGeoPosition(celestialBody, currentTime)) {
                 is Success -> {
+                    val equitorialRadius = when(geoPositionResult.data.body) {
+                        "Sun" -> CelNavUtils.equatorialRadiusSun
+                        "Moon" -> CelNavUtils.equatorialRadiusMoon
+                        else -> 0.0
+                    }
                     _uiState.update {
                         it.copy(
                             celestialBody = geoPositionResult.data.body,
@@ -96,6 +101,7 @@ class AddEditSightViewModel @Inject constructor (
                             gha = geoPositionResult.data.GHA,
                             dec = geoPositionResult.data.dec,
                             distance = geoPositionResult.data.distance,
+                            equitorialRadius = equitorialRadius,
                             hasGP = true)
                     }
                     doSightReduction()

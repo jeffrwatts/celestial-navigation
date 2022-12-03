@@ -230,6 +230,53 @@ fun CelestialBodyDropDown(
 }
 
 @Composable
+fun LimbDropDown(
+    onValueChanged: (limb: CelNavUtils.Limb) -> Unit
+) {
+    var selected by remember { mutableStateOf(CelNavUtils.Limb.Center) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val listItems = listOf(CelNavUtils.Limb.Upper, CelNavUtils.Limb.Lower, CelNavUtils.Limb.Center)
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = "Limb: ", style = Typography.titleLarge)
+        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                Text(text = limbToDisplayName(selected), style = Typography.titleLarge)
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Filled.ArrowDropDown, stringResource(id = R.string.app_name))
+                }
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+            ) {
+                listItems.forEach { itemValue ->
+                    DropdownMenuItem(text = { Text(text = limbToDisplayName(itemValue), style = Typography.bodyLarge) },
+                        onClick = {
+                            selected = itemValue
+                            onValueChanged(itemValue)
+                            expanded = false
+                        })
+                    Divider()
+                }
+            }
+        }
+    }
+}
+
+fun limbToDisplayName(limb: CelNavUtils.Limb): String {
+    return when (limb) {
+        CelNavUtils.Limb.Upper -> "Upper Limb"
+        CelNavUtils.Limb.Lower -> "Lower Limb"
+        CelNavUtils.Limb.Center -> "Center"
+    }
+}
+
+@Composable
 fun UTC (utc: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "UTC:", style = Typography.titleLarge)

@@ -72,6 +72,8 @@ object CelNavUtils {
     }
 
     fun calculateSemiDiameterCorrection(Ha: Double, distance: Double, equatorialRadius: Double, limb: Limb): Double {
+        if (limb == Limb.Center) return 0.0
+
         val sd = degrees(asin(equatorialRadius / distance))
         var sdMinutes = roundToPrecision(sd * 60, 1)
 

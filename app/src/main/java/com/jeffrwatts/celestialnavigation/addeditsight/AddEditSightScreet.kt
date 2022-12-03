@@ -58,6 +58,7 @@ fun AddEditSightScreen(
             onHsChanged = viewModel::setHs,
             onIcChanged = viewModel::setIc,
             onEyeHeightChanged = viewModel::setEyeHeight,
+            onLimbChanged = viewModel::setLimb,
             onLatChanged = viewModel::setLat,
             onLonChanged = viewModel::setLon,
             modifier = Modifier.padding(paddingValues)
@@ -88,6 +89,7 @@ private fun AddEditSightContent(
     onHsChanged: (newHs: Double)->Unit,
     onIcChanged: (newIc: Double)->Unit,
     onEyeHeightChanged: (newEyeHeight: Int)->Unit,
+    onLimbChanged: (newLimb: CelNavUtils.Limb) -> Unit,
     onLatChanged: (newLat: Double)->Unit,
     onLonChanged: (newLon: Double)->Unit,
     modifier: Modifier = Modifier
@@ -114,6 +116,7 @@ private fun AddEditSightContent(
             AngleInput(label = "Hs:", angle = uiState.Hs, onHsChanged)
             IC(uiState.ic, onIcChanged)
             Dip(uiState.eyeHeight, uiState.dip, onEyeHeightChanged)
+            LimbDropDown(onValueChanged = onLimbChanged)
             MinutesValue(label = "Refr:", minutes = uiState.refraction)
             MinutesValue(label = "SD:", minutes = uiState.SD)
             MinutesValue(label = "HP:", minutes = uiState.HP)

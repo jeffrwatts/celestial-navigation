@@ -21,7 +21,7 @@ import com.jeffrwatts.celestialnavigation.ui.theme.Typography
 import kotlin.math.pow
 
 val fieldModifiers = Modifier
-    .width(75.dp)
+    .width(80.dp)
 
 @Composable
 fun AngleDisplay(label: String, angle: Double) {
@@ -127,7 +127,7 @@ fun IC(icMinutes: Double, onValueChanged: (minutes: Double)->Unit) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "IC: ", style = Typography.titleLarge)
-        TextField(value = if (textIcMinutes.isEmpty()) "" else icMinutes.toString(),
+        TextField(value = if (textIcMinutes.isEmpty() and (icMinutes==0.0)) "" else icMinutes.toString(),
             textStyle = Typography.bodyLarge,
             modifier = fieldModifiers,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -234,6 +234,15 @@ fun UTC (utc: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "UTC:", style = Typography.titleLarge)
         Text(text = utc, style = Typography.bodyLarge)
+    }
+}
+
+@Composable
+fun MinutesValue(label: String, minutes: Double) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(text = label, style = Typography.titleLarge)
+        Text(text = minutes.toString(), style = Typography.bodyLarge, modifier = fieldModifiers, textAlign = TextAlign.End)
+        Text(text = "'", style = Typography.bodyLarge)
     }
 }
 

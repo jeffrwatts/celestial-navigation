@@ -20,6 +20,8 @@ import com.google.maps.android.compose.*
 import com.jeffrwatts.celestialnavigation.PlotTopAppBar
 import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
+import com.jeffrwatts.celestialnavigation.utils.CelNavUtils.konaLat
+import com.jeffrwatts.celestialnavigation.utils.CelNavUtils.konaLon
 
 
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
@@ -49,7 +51,7 @@ fun PlotScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         // If we have a sight, center on one of the first of the assumed positions
-        val cameraPosition = LatLng(19.6419, -155.9962) // Default to Kona.
+        val cameraPosition = LatLng(konaLat, konaLon) // Default to Kona.
 
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)

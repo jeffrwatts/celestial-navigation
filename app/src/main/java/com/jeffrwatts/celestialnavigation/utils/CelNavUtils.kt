@@ -176,9 +176,9 @@ object CelNavUtils {
     }
 
     // Test Data
-    const val utc: String = "1978/7/25 04:07:02"
-    val drLat = angle(44, 36.0, North)
-    val drLon = angle(122, 14.0, West)
+    //const val utc: String = "1978/7/25 04:07:02"
+    val altairAntaresLat = angle(44, 36.0, North)
+    val altairAntaresLon = angle(122, 14.0, West)
 
     val altairHs = angle(30, 35.4)
     val altairGHA = angle(66, 55.19)
@@ -189,4 +189,7 @@ object CelNavUtils {
     val antaresGHA = angle(117, 19.98)
     val antaresDec = angle(26, 23.05, South)
     val antaresDistance = 5714217650853814.0
+
+    val konaLat = angle(19, 39.51, North)
+    val konaLon = angle(155, 59.77, West)
 }

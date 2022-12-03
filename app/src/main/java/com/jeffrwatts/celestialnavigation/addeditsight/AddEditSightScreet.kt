@@ -47,17 +47,13 @@ fun AddEditSightScreen(
         AddEditSightContent(
             uiState,
             onGetGeographicalPosition = { celestialBody->
-                viewModel.getGeographicalPosition(celestialBody)
-                // TOOD REMOVE.
-                if (celestialBody == "Antares") {
-                    viewModel.setHs(CelNavUtils.antaresHs)
-                    viewModel.setLat(CelNavUtils.drLat)
-                    viewModel.setLon(CelNavUtils.drLon)
-                } else if (celestialBody == "Altair") {
-                    viewModel.setHs(CelNavUtils.altairHs)
-                    viewModel.setLat(CelNavUtils.drLat)
-                    viewModel.setLon(CelNavUtils.drLon)
-                }
+                viewModel.getGeoPosition(celestialBody)
+
+                // TODO Remove.
+                viewModel.setIc(1.0)
+                viewModel.setEyeHeight(10)
+                viewModel.setLat(CelNavUtils.konaLat)
+                viewModel.setLon(CelNavUtils.konaLon)
             },
             onHsChanged = viewModel::setHs,
             onIcChanged = viewModel::setIc,
@@ -118,6 +114,9 @@ private fun AddEditSightContent(
             AngleInput(label = "Hs:", angle = uiState.Hs, onHsChanged)
             IC(uiState.ic, onIcChanged)
             Dip(uiState.eyeHeight, uiState.dip, onEyeHeightChanged)
+            MinutesValue(label = "Refr:", minutes = uiState.refraction)
+            MinutesValue(label = "SD:", minutes = uiState.SD)
+            MinutesValue(label = "HP:", minutes = uiState.HP)
             AngleDisplay(label = "Ho:", angle = uiState.Ho)
             Divider(thickness = 2.dp)
             AngleInput(label = "Lat:", angle = uiState.lat, onLatChanged, "N", "S")

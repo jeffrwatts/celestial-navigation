@@ -9,7 +9,9 @@ import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs
 import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.data.Result.Success
 import com.jeffrwatts.celestialnavigation.data.Sight
+import com.jeffrwatts.celestialnavigation.data.source.GeoPositionRepository
 import com.jeffrwatts.celestialnavigation.data.source.SightsRepository
+import com.jeffrwatts.celestialnavigation.data.succeeded
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +41,7 @@ data class AddEditSightUiState(
 
     // Sextant Values
     val Hs: Double = 0.0,
-    val hasHs: Boolean = false,
+    //val hasHs: Boolean = false,
     val ic: Double = 0.0,
     val eyeHeight: Int = 0,
     val limb: CelNavUtils.Limb = CelNavUtils.Limb.Center,
@@ -65,6 +67,7 @@ data class AddEditSightUiState(
 @HiltViewModel
 class AddEditSightViewModel @Inject constructor (
     private val sightsRepository: SightsRepository,
+    private val geoPositionRepository: GeoPositionRepository,
     savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val sightId: String? = savedStateHandle[CelNavDestinationsArgs.SIGHT_ID_ARG]
@@ -81,43 +84,28 @@ class AddEditSightViewModel @Inject constructor (
         }
     }
 
-    fun getGeographicalPosition(celestialBody: String) {
-        if (celestialBody.isEmpty()) {
-            _uiState.update {
-                it.copy(userMessage = R.string.celestial_body_not_selected)
+    fun getGeoPosition(celestialBody: String) {
+        val currentTime = System.currentTimeMillis().toDouble() / 1000.0
+        viewModelScope.launch {
+            when (val geoPositionResult = geoPositionRepository.getGeoPosition(celestialBody, currentTime)) {
+                is Success -> {
+                    _uiState.update {
+                        it.copy(
+                            celestialBody = geoPositionResult.data.body,
+                            utc = geoPositionResult.data.utc,
+                            gha = geoPositionResult.data.GHA,
+                            dec = geoPositionResult.data.dec,
+                            distance = geoPositionResult.data.distance,
+                            hasGP = true)
+                    }
+                    doSightReduction()
+                }
+                else -> {
+                    _uiState.update {
+                        it.copy(userMessage = R.string.failed_to_get_position)
+                    }
+                }
             }
-            return
-        }
-        val currentTime = System.currentTimeMillis()
-        val date = Date(currentTime)
-        val sdf = SimpleDateFormat("yyyy/MM/dd hh:mm:ss", Locale.US)
-        val utc = sdf.format(date)
-
-        _uiState.update {
-            it.copy(celestialBody = celestialBody, utc = utc)
-        }
-
-        // TODO Request sight data from server.  For now two hardcoded values.
-        if (celestialBody == "Altair") {
-            _uiState.update {
-                it.copy(
-                    gha = CelNavUtils.altairGHA,
-                    dec = CelNavUtils.altairDec,
-                    distance = CelNavUtils.altairDistance,
-                    hasGP = true
-                )
-            }
-            doSightReduction()
-        } else if (celestialBody == "Antares") {
-            _uiState.update {
-                it.copy(
-                    gha = CelNavUtils.antaresGHA,
-                    dec = CelNavUtils.antaresDec,
-                    distance = CelNavUtils.antaresDistance,
-                    hasGP = true
-                )
-            }
-            doSightReduction()
         }
     }
 
@@ -137,7 +125,7 @@ class AddEditSightViewModel @Inject constructor (
 
     fun setHs (Hs: Double) {
         _uiState.update {
-            it.copy(Hs = Hs, hasHs = true)
+            it.copy(Hs = Hs)
         }
         doSightReduction()
     }
@@ -186,7 +174,7 @@ class AddEditSightViewModel @Inject constructor (
     }
 
     private fun canDoSightReduction(): Boolean {
-        return ((uiState.value.hasHs) and (uiState.value.hasLat) and (uiState.value.hasLon) and (uiState.value.hasGP))
+        return ((uiState.value.hasLat) and (uiState.value.hasLon) and (uiState.value.hasGP))
     }
 
     private fun doSightReduction() {

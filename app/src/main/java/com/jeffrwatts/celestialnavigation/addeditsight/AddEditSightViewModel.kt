@@ -243,7 +243,8 @@ class AddEditSightViewModel @Inject constructor (
             Hc = uiState.value.Hc,
             Zn = uiState.value.Zn,
             lopDirection = uiState.value.lopDirection,
-            intercept = uiState.value.intercept)
+            intercept = uiState.value.intercept,
+            isActive = true)
         sightsRepository.saveSight(newSight)
         _uiState.update {
             it.copy(isSightSaved = true)

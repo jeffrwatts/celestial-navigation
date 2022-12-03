@@ -3,13 +3,8 @@ package com.jeffrwatts.celestialnavigation.plotting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.jeffrwatts.celestialnavigation.ADD_EDIT_RESULT_OK
-import com.jeffrwatts.celestialnavigation.DELETE_RESULT_OK
-import com.jeffrwatts.celestialnavigation.EDIT_RESULT_OK
-import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.data.source.SightsRepository
-import com.jeffrwatts.celestialnavigation.sights.FilteringUiInfo
 import com.jeffrwatts.celestialnavigation.utils.Async
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed

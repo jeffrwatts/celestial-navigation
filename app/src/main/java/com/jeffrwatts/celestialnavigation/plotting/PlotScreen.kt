@@ -18,7 +18,10 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -30,7 +33,9 @@ import com.jeffrwatts.celestialnavigation.utils.CelNavUtils.konaLat
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils.konaLon
 
 
-@OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalPermissionsApi::class
+)
 @Composable
 fun PlotScreen(
     onAddSight: () -> Unit,
@@ -43,7 +48,7 @@ fun PlotScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             PlotTopAppBar(
-                onEditSights = onEditSights,
+                onEditSights = { onEditSights },
                 onClearSights = viewModel::clearAllSights)
         },
         modifier = modifier.fillMaxSize(),
@@ -56,6 +61,7 @@ fun PlotScreen(
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val handleLongClick = remember { mutableStateOf(false) }
+        val promptForPermission = remember { mutableStateOf(true) }
         var longClickLatLng = LatLng (0.0, 0.0)
 
         // If we have a sight, center on one of the first of the assumed positions
@@ -65,14 +71,37 @@ fun PlotScreen(
             position = CameraPosition.fromLatLngZoom(cameraPosition, 10f)
         }
 
+        val locationPermissionsState = rememberMultiplePermissionsState(
+            listOf(
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+            )
+        )
+        val permissionsGranted = locationPermissionsState.allPermissionsGranted
+
+        if (!permissionsGranted and promptForPermission.value) {
+            AlertDialog(
+                onDismissRequest = { promptForPermission.value = false },
+                title = { Text(text = "Enable Location Permission")},
+                text = { Text(text = "To view your actual location, please grant permission")},
+                confirmButton = { Button(onClick = { locationPermissionsState.launchMultiplePermissionRequest() }) {
+                    Text(text = "Yes")
+                }},
+                dismissButton = { Button(onClick = { promptForPermission.value = false }) {
+                    Text( text = "No")
+                }}
+            )
+        }
+
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
             cameraPositionState = cameraPositionState,
-            onMapLongClick = { longClickLatLng = it; handleLongClick.value = true}
+            onMapLongClick = { longClickLatLng = it; handleLongClick.value = true},
+            properties = MapProperties(isMyLocationEnabled = permissionsGranted)
         )
-        { 
+        {
             if (!uiState.isLoading) {
                 val builder = LatLngBounds.Builder()
                 uiState.items.forEach { lop->
@@ -97,13 +126,14 @@ fun PlotScreen(
                 }
             }
 
-
-
             if (handleLongClick.value) {
                 Dialog(onDismissRequest = {handleLongClick.value = false })
                 {
                     Column(modifier = Modifier
-                        .background(color = colorResource(id = R.color.white), shape = RectangleShape)
+                        .background(
+                            color = colorResource(id = R.color.white),
+                            shape = RectangleShape
+                        )
                         .padding(all = 20.dp)) {
                         Text(text = "Set Position as...")
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -117,6 +147,7 @@ fun PlotScreen(
                     }
                 }
             }
+
 
             uiState.assumedPosition?.let { assumedPosition->
                 Marker(

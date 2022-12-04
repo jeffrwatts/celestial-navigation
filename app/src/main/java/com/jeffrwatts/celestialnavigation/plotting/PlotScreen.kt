@@ -1,14 +1,20 @@
 package com.jeffrwatts.celestialnavigation.plotting
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,6 +55,8 @@ fun PlotScreen(
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val handleLongClick = remember { mutableStateOf(false) }
+        var longClickLatLng = LatLng (0.0, 0.0)
 
         // If we have a sight, center on one of the first of the assumed positions
         val cameraPosition = LatLng(konaLat, konaLon) // Default to Kona.
@@ -62,9 +70,9 @@ fun PlotScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
             cameraPositionState = cameraPositionState,
-            onMapLongClick = { viewModel.setFix(it)}
+            onMapLongClick = { longClickLatLng = it; handleLongClick.value = true}
         )
-        {
+        { 
             if (!uiState.isLoading) {
                 val builder = LatLngBounds.Builder()
                 uiState.items.forEach { lop->
@@ -86,6 +94,27 @@ fun PlotScreen(
 
                 if (uiState.items.isNotEmpty()) {
                     cameraPositionState.move(CameraUpdateFactory.newLatLngBounds(builder.build(), 64))
+                }
+            }
+
+
+
+            if (handleLongClick.value) {
+                Dialog(onDismissRequest = {handleLongClick.value = false })
+                {
+                    Column(modifier = Modifier
+                        .background(color = colorResource(id = R.color.white), shape = RectangleShape)
+                        .padding(all = 20.dp)) {
+                        Text(text = "Set Position as...")
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Button(onClick = { viewModel.setAssumedPosition(longClickLatLng); handleLongClick.value = false }) {
+                                Text(text = "Assumed")
+                            }
+                            Button(onClick = { viewModel.setFix(longClickLatLng); handleLongClick.value = false }) {
+                                Text(text = "Fix")
+                            }
+                        }
+                    }
                 }
             }
 

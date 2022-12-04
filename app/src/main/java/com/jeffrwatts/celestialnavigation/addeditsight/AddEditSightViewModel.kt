@@ -82,6 +82,12 @@ class AddEditSightViewModel @Inject constructor (
         if (sightId != null) {
             loadSight(sightId)
         }
+
+        // TODO Read from Prefs for AP, IC, and EyeHeight.
+        setIc(-1.0)
+        setEyeHeight(16)
+        setLat(CelNavUtils.konaLat)
+        setLon(CelNavUtils.konaLon)
     }
 
     fun getGeoPosition(celestialBody: String) {

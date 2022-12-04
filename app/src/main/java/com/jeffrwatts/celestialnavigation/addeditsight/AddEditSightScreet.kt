@@ -46,15 +46,7 @@ fun AddEditSightScreen(
 
         AddEditSightContent(
             uiState,
-            onGetGeographicalPosition = { celestialBody->
-                viewModel.getGeoPosition(celestialBody)
-
-                // TODO Remove.
-                viewModel.setIc(1.0)
-                viewModel.setEyeHeight(10)
-                viewModel.setLat(CelNavUtils.konaLat)
-                viewModel.setLon(CelNavUtils.konaLon)
-            },
+            onGetGeographicalPosition = viewModel::getGeoPosition,
             onHsChanged = viewModel::setHs,
             onIcChanged = viewModel::setIc,
             onEyeHeightChanged = viewModel::setEyeHeight,
@@ -113,19 +105,18 @@ private fun AddEditSightContent(
             AngleDisplay(label = "GHA:", angle = uiState.gha)
             Dec(angle = uiState.dec)
             Divider(thickness = 2.dp)
-            AngleInput(label = "Hs:", angle = uiState.Hs, onHsChanged)
-            IC(uiState.ic, onIcChanged)
-            Dip(uiState.eyeHeight, uiState.dip, onEyeHeightChanged)
+            AngleInput("Hs:", onHsChanged, uiState.Hs, 90)
+            IC(onIcChanged, uiState.ic)
+            Dip(uiState.dip, onEyeHeightChanged, uiState.eyeHeight)
             LimbDropDown(onValueChanged = onLimbChanged)
             MinutesValue(label = "Refr:", minutes = uiState.refraction)
             MinutesValue(label = "SD:", minutes = uiState.SD)
             MinutesValue(label = "HP:", minutes = uiState.HP)
             AngleDisplay(label = "Ho:", angle = uiState.Ho)
             Divider(thickness = 2.dp)
-            AngleInput(label = "Lat:", angle = uiState.lat, onLatChanged, "N", "S")
-            AngleInput(label = "Lon:", angle = uiState.lon, onLonChanged, "E", "W")
+            AngleInput(label = "Lat:", onLatChanged, uiState.lat, 90, "N", "S")
+            AngleInput(label = "Lon:", onLonChanged, uiState.lon, 180, "E", "W")
             Divider(thickness = 2.dp)
-            AngleDisplay(label = "LHA:", angle = uiState.lha)
             AngleDisplay(label = "Hc:", uiState.Hc)
             AngleDisplay(label = "Zn:", uiState.Zn)
             Intercept(intercept = uiState.intercept, direction = uiState.lopDirection)

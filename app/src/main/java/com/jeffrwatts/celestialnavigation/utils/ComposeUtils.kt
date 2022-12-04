@@ -23,143 +23,162 @@ import kotlin.math.pow
 val fieldModifiers = Modifier
     .width(80.dp)
 
+fun intValid (intText: String, limit: Int? = null): Boolean {
+    if (intText.isEmpty()) return true
+    val int = intText.toIntOrNull() ?: return false
+    return if (limit != null) int <= limit else true
+}
+
+fun minutesValid (minutes: String): Boolean {
+    if (minutes.isEmpty()) return true
+    val minutesDouble = minutes.toDoubleOrNull() ?: return false
+    return minutesDouble < 60.0
+}
+
+fun computeIcMinutes (minutes: String, icDirection: CelNavUtils.ICDirection): Double {
+    val minutesDouble = if (minutes.isEmpty()) 0.0 else minutes.toDouble()
+    return if (icDirection == CelNavUtils.ICDirection.On) minutesDouble*-1 else minutesDouble
+}
+
 @Composable
-fun AngleDisplay(label: String, angle: Double) {
+fun AngleDisplay(label: String, angle: Double, signPositive: String? = null, signNegative: String? = null) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        val (degrees, minutes, _) = CelNavUtils.degreesMinutesSign(angle)
+        val (degrees, minutes, sign) = CelNavUtils.degreesMinutesSign(angle)
         Text(text = label, style = Typography.titleLarge)
         Text(text = degrees.toString(), style = Typography.bodyLarge, modifier = fieldModifiers, textAlign = TextAlign.End)
         Text(text = "°", style = Typography.bodyLarge)
         Text(text = minutes.toString(), style = Typography.bodyLarge, modifier = fieldModifiers, textAlign = TextAlign.End)
         Text(text = "'", style = Typography.bodyLarge)
+
+        if (!signNegative.isNullOrEmpty() or !signPositive.isNullOrEmpty()) {
+            Text("${if (sign == 1) signPositive else signNegative }", style = Typography.titleLarge)
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AngleInput(label: String, angle: Double, onValueChanged: (newValue: Double)->Unit, signPositive: String? = null, signNegative: String? = null) {
+fun AngleInput(label: String, onValueChanged: (newValue: Double)->Unit, initialValue: Double, maxDegrees: Int, signPositive: String? = null, signNegative: String? = null) {
+    var initialize by remember { mutableStateOf(true) }
     var textInputDegrees by remember { mutableStateOf("") }
     var textInputMinutes by remember { mutableStateOf("") }
-    val (degrees, minutes, sign) = CelNavUtils.degreesMinutesSign(angle)
+    var inputSign by remember { mutableStateOf(1) }
 
-    // TODO: Figure out the initialization case problem where I need to put (angle==0.0)
+    if (initialize) {
+        val (degrees, minutes, sign) = CelNavUtils.degreesMinutesSign(initialValue)
+        textInputDegrees = degrees.toString()
+        textInputMinutes = minutes.toString()
+        inputSign = sign
+        initialize = false
+    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-
         Text(text = label, style = Typography.titleLarge)
-        TextField(value = if (textInputDegrees.isEmpty() and (angle==0.0)) "" else degrees.toString(),
+        TextField(
+            value = textInputDegrees,
             textStyle = Typography.bodyLarge,
             modifier = fieldModifiers,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = {
-                textInputDegrees = it
-                val newDegrees = textToDegrees(it)
-                if (newDegrees != -1) {
-                    onValueChanged(CelNavUtils.angle(newDegrees, minutes, sign))
+                if (intValid(it, maxDegrees)) {
+                    textInputDegrees = it
+                    val degrees = if (it.isEmpty()) 0 else it.toInt()
+                    val minutes = if (textInputMinutes.isEmpty()) 0.0 else textInputMinutes.toDouble()
+                    onValueChanged(CelNavUtils.angle(degrees, minutes, inputSign))
                 }
             })
         Text(text = "°", style = Typography.bodyLarge)
-        TextField(value = if (textInputMinutes.isEmpty() and (angle==0.0)) "" else minutes.toString(),
+        TextField(
+            value = textInputMinutes,
             textStyle = Typography.bodyLarge,
             modifier = fieldModifiers,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = {
-                textInputMinutes = it
-                val newMinutes = textToMinutes(it)
-                if (newMinutes != -1.0) {
-                    onValueChanged(CelNavUtils.angle(degrees, newMinutes, sign))
+                if (minutesValid(it)) {
+                    textInputMinutes = it
+                    val degrees = if (textInputDegrees.isEmpty()) 0 else textInputDegrees.toInt()
+                    val minutes = if (it.isEmpty()) 0.0 else it.toDouble()
+                    onValueChanged(CelNavUtils.angle(degrees, minutes, inputSign))
                 }
             })
         Text(text = "'", style = Typography.bodyLarge)
         if (!signNegative.isNullOrEmpty() or !signPositive.isNullOrEmpty()) {
             Button(onClick = {
-                val newSign = if (sign == 1) -1 else 1
-                onValueChanged(CelNavUtils.angle(degrees, minutes, newSign))
+                inputSign *= -1
+                val degrees = if (textInputDegrees.isEmpty()) 0 else textInputDegrees.toInt()
+                val minutes = if (textInputMinutes.isEmpty()) 0.0 else textInputMinutes.toDouble()
+                onValueChanged(CelNavUtils.angle(degrees, minutes, inputSign))
             }) {
-                Text("${if (sign == 1) signPositive else signNegative }")
+                Text("${if (inputSign == 1) signPositive else signNegative }")
             }
         }
     }
 }
 
-fun textToDegrees (text: String): Int {
-    return try {
-        val degrees =  text.toInt()
-        if (degrees < 360) degrees else -1
-    } catch (e: NumberFormatException) {
-        -1
-    }
-}
-
-fun textToMinutes (text: String): Double {
-    return try {
-        val degrees =  text.toDouble()
-        if (degrees < 60) degrees else -1.0
-    } catch (e: NumberFormatException) {
-        -1.0
-    }
-}
-
-fun calculateNewMinutes(newValue: String, prevMinutes: Double, prevDecimalPrecision: Int): Pair<Double, Int> {
-    var minutes = if (newValue.isEmpty()) 0.0 else newValue.toDouble()
-    var decimalIndex = newValue.indexOf('.')
-
-    if (decimalIndex == -1) {
-        // The '.' was just deleted, adjust the new value by the last known decimal precision.
-        minutes /= 10.0.pow(prevDecimalPrecision)
-        decimalIndex = minutes.toString().indexOf('.')
-    }
-
-    if (minutes >=60) {
-        minutes = prevMinutes
-    }
-
-    val newDecimalPrecision = minutes.toString().length-decimalIndex-1
-
-    return Pair(minutes, newDecimalPrecision)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IC(icMinutes: Double, onValueChanged: (minutes: Double)->Unit) {
+fun IC(onValueChanged: (minutes: Double)->Unit, initialValue: Double) {
+    var initialize by remember { mutableStateOf(true) }
     var textIcMinutes by remember { mutableStateOf("") }
-    val icDirection = if (icMinutes < 0) CelNavUtils.ICDirection.On else CelNavUtils.ICDirection.Off
+    var icDirection by remember { mutableStateOf(CelNavUtils.ICDirection.Off) }
+
+    if (initialize) {
+        var initialIc = initialValue
+        if (initialIc < 0.0) {
+            icDirection = CelNavUtils.ICDirection.On
+            initialIc *= -1.0
+        }
+        textIcMinutes = initialIc.toString()
+        initialize = false
+    }
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "IC: ", style = Typography.titleLarge)
-        TextField(value = if (textIcMinutes.isEmpty() and (icMinutes==0.0)) "" else icMinutes.toString(),
+        TextField(
+            value = textIcMinutes,
             textStyle = Typography.bodyLarge,
             modifier = fieldModifiers,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = {
-                textIcMinutes = it
-                val newMinutes = textToMinutes(it)
-                if (newMinutes != -1.0) {
-                    onValueChanged(newMinutes)
+                if (minutesValid(it)) {
+                    textIcMinutes = it
+                    onValueChanged(computeIcMinutes(it, icDirection))
                 }
             })
+        Text(text = "'", style = Typography.bodyLarge)
         Button(onClick = {
-            val newValue = icMinutes * -1
-            onValueChanged(newValue)
+            icDirection = if (icDirection == CelNavUtils.ICDirection.On) CelNavUtils.ICDirection.Off else CelNavUtils.ICDirection.On
+            onValueChanged(computeIcMinutes(textIcMinutes, icDirection))
         })
         {
             Text(if (icDirection == CelNavUtils.ICDirection.On) "On" else "Off")
         }
+        Text(text = if (icDirection == CelNavUtils.ICDirection.On) "(Sub)" else "(Add)", style = Typography.bodyLarge)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dip(eyeHeight: Int, dip: Double, onValueChanged: (newValue: Int)->Unit) {
+fun Dip(dip: Double, onValueChanged: (newValue: Int)->Unit, initialValue: Int) {
+    var initialize by remember { mutableStateOf(true) }
+    var textEyeHeight by remember { mutableStateOf("") }
+
+    if (initialize) {
+        textEyeHeight = initialValue.toString()
+        initialize = false
+    }
+
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "EyeHeight: ", style = Typography.titleLarge)
-        TextField(value = eyeHeight.toString(),
+        TextField(value = textEyeHeight,
             textStyle = Typography.bodyLarge,
             modifier = fieldModifiers,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             onValueChange = {
-                if (it.isNotEmpty()) {
-                    onValueChanged(it.toInt())
+                if (intValid(it)) {
+                    textEyeHeight = it
+                    val eyeHeight = if (it.isEmpty()) 0 else it.toInt()
+                    onValueChanged(eyeHeight)
                 }
             })
         Text(text = "Dip:", style = Typography.titleLarge)

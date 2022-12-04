@@ -147,7 +147,7 @@ private fun SightsEmptyContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_no_fill),
+            painter = painterResource(id = R.drawable.sextant),
             contentDescription = stringResource(R.string.no_sights_image_content_description),
             modifier = Modifier.size(96.dp)
         )

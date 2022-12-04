@@ -48,7 +48,7 @@ fun PlotScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             PlotTopAppBar(
-                onEditSights = { onEditSights },
+                onEditSights = { onEditSights() },
                 onClearSights = viewModel::clearAllSights)
         },
         modifier = modifier.fillMaxSize(),

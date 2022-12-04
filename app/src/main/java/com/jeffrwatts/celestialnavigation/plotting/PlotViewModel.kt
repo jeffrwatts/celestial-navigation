@@ -102,6 +102,8 @@ class PlotViewModel @Inject constructor(
     fun clearAllSights () {
         viewModelScope.launch {
             sightsRepository.deleteAllSights()
+            _assumedPosition.value = null
+            _fix.value = null
         }
     }
 

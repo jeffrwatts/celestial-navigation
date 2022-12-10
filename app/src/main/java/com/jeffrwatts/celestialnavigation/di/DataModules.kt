@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.jeffrwatts.celestialnavigation.BuildConfig
 import com.jeffrwatts.celestialnavigation.data.source.*
+import com.jeffrwatts.celestialnavigation.data.source.local.CelestialBodyDatabase
+import com.jeffrwatts.celestialnavigation.data.source.local.CelestialBodyLocalDataSource
 import com.jeffrwatts.celestialnavigation.data.source.local.SightsDatabase
 import com.jeffrwatts.celestialnavigation.data.source.local.SightsLocalDataSource
+import com.jeffrwatts.celestialnavigation.data.source.remote.CelestialBodyRemoteDataSource
 import com.jeffrwatts.celestialnavigation.data.source.remote.GeoPositionRemoteDataSource
 import com.jeffrwatts.celestialnavigation.network.GeoPositionApi
 import dagger.Module
@@ -19,9 +22,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-//@Qualifier
-//@Retention(AnnotationRetention.RUNTIME)
-//annotation class RemoteSightsDataSource
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class LocalCelestialBodyDataSource
+
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class RemoteCelestialBodyDataSource
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -37,11 +44,20 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideSightsRepository(
-        //@RemoteSightsDataSource remoteDataSource: SightsDataSource,
         @LocalSightsDataSource localDataSource: SightsDataSource,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): SightsRepository {
         return DefaultSightsRepository(localDataSource, ioDispatcher)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCelestialBodyRepository(
+        @LocalCelestialBodyDataSource localDataSource: CelestialBodyDataSource,
+        @RemoteCelestialBodyDataSource remoteDataSource: CelestialBodyDataSource,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CelestialBodyRepository {
+        return DefaultCelestialBodyRepository(localDataSource, remoteDataSource, ioDispatcher)
     }
 
     @Singleton
@@ -65,16 +81,6 @@ object RepositoryModule {
 @InstallIn(SingletonComponent::class)
 object DataSourceModule {
 
-    //@Singleton
-    //@RemoteSightsDataSource
-    //@Provides
-    //fun provideTasksRemoteDataSource(
-    //    database: SightsDatabase,
-    //    @IoDispatcher ioDispatcher: CoroutineDispatcher
-    //): SightsDataSource {
-    //    return SightsLocalDataSource(database.sightsDao(), ioDispatcher)
-    //}
-
     @Singleton
     @LocalSightsDataSource
     @Provides
@@ -83,6 +89,26 @@ object DataSourceModule {
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): SightsDataSource {
         return SightsLocalDataSource(database.sightsDao(), ioDispatcher)
+    }
+
+    @Singleton
+    @LocalCelestialBodyDataSource
+    @Provides
+    fun provideCelestialBodyLocalDataSource(
+        database: CelestialBodyDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CelestialBodyDataSource {
+        return CelestialBodyLocalDataSource(database.celestialBodyDao(), ioDispatcher)
+    }
+
+    @Singleton
+    @RemoteCelestialBodyDataSource
+    @Provides
+    fun provideCelestialBodyRemoteDataSource(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CelestialBodyDataSource {
+        return CelestialBodyRemoteDataSource(context, ioDispatcher)
     }
 
     @Singleton
@@ -101,11 +127,21 @@ object DataSourceModule {
 object DatabaseModule {
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext context: Context): SightsDatabase {
+    fun provideSightsDataBase(@ApplicationContext context: Context): SightsDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
             SightsDatabase::class.java,
             "Sights.db"
+        ).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideCelestialBodyDataBase(@ApplicationContext context: Context): CelestialBodyDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            CelestialBodyDatabase::class.java,
+            "CelestialBody.db"
         ).build()
     }
 }

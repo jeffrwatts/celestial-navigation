@@ -27,6 +27,9 @@
     <string name="edit_sights">Edit Sights</string>
     <string name="sights">All Sights</string>
     <string name="failed_to_get_position">Failed to Get GeoPosition</string>
+    <string name="celestial_body">Celestial Bodies</string>
+    <string name="populate_db">Load DB</string>
+    <string name="load_db">Load DB</string>
 
     <string-array name="celestial_bodies">
         <item>Sun</item>

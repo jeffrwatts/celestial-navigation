@@ -20,11 +20,12 @@ import androidx.compose.ui.res.stringResource
 @Composable
 fun PlotTopAppBar(
     onEditSights: () -> Unit,
-    onClearSights: () -> Unit) {
+    onClearSights: () -> Unit,
+    onLoadDB: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
-            MoreMenu(onEditSights, onClearSights)
+            MoreMenu(onEditSights, onClearSights, onLoadDB)
         },
         modifier = Modifier.fillMaxWidth()
     )
@@ -45,10 +46,27 @@ fun SightsTopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CelestialBodyTopAppBar(
+    onBack: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = stringResource(id = R.string.celestial_body)) },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.menu_back))
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+
 @Composable
 private fun MoreMenu(
     onEditSights: () -> Unit,
-    onClearSights: () -> Unit
+    onClearSights: () -> Unit,
+    onLoadDB: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
@@ -61,6 +79,9 @@ private fun MoreMenu(
         DropdownMenuItem(
             text = { Text(text = stringResource(id = R.string.clear_sights)) },
             onClick = { onClearSights(); closeMenu() })
+        DropdownMenuItem(
+            text = {Text(text = stringResource(id = R.string.load_db))},
+            onClick = { onLoadDB(); closeMenu() })
     }
 }
 

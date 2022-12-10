@@ -12,6 +12,7 @@ import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.jeffrwatts.celestialnavigation.data.Result
+import com.jeffrwatts.celestialnavigation.data.source.CelestialBodyRepository
 import com.jeffrwatts.celestialnavigation.data.source.SightPrefsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -56,7 +57,8 @@ data class PlotUiState(
 @HiltViewModel
 class PlotViewModel @Inject constructor(
     private val sightsRepository: SightsRepository,
-    private val sightPrefsRepository: SightPrefsRepository
+    private val sightPrefsRepository: SightPrefsRepository,
+    private val celestialBodyRepository: CelestialBodyRepository
 ) : ViewModel() {
     private val _assumedPosition: MutableStateFlow<LatLng?>
 
@@ -97,6 +99,13 @@ class PlotViewModel @Inject constructor(
             started = WhileUiSubscribed,
             initialValue = PlotUiState(isLoading = true)
         )
+
+    fun loadDB() {
+        viewModelScope.launch {
+            // TEMP populate the DB.
+            celestialBodyRepository.getCelestialBodies(true)
+        }
+    }
 
     fun setFix(fix: LatLng) {
         _fix.value = fix

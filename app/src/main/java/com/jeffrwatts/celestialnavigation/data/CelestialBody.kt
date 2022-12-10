@@ -14,6 +14,7 @@ enum class CelestialObjectBodyType {
 @Entity(tableName = "celestialBodies")
 data class CelestialBody @JvmOverloads constructor(
     @PrimaryKey @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "order") var order: Int,
     @ColumnInfo(name = "objtype") var objtype: CelestialObjectBodyType,
     @ColumnInfo(name = "magnitude") var magnitude: Double,
     @ColumnInfo(name = "ra") var ra: Double,

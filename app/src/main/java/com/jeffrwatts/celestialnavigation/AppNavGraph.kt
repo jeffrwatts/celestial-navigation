@@ -21,6 +21,7 @@ import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.TITLE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
+import com.jeffrwatts.celestialnavigation.addeditsight.CelestialBodyScreen
 import com.jeffrwatts.celestialnavigation.plotting.PlotScreen
 import com.jeffrwatts.celestialnavigation.sights.SightsScreen
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +51,7 @@ fun AppNavGraph(
             CelNavDestinations.PLOT_ROUTE) {
             PlotScreen(
                 onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                onEditSights = { navActions.navigateToSights() })
+                onEditSights = { navActions.navigateToCelestialBodies() })
         }
         composable(
             CelNavDestinations.ADD_EDIT_SIGHT_ROUTE,
@@ -78,6 +79,9 @@ fun AppNavGraph(
                 onSightClick = { sight -> navActions.navigateToSightDetail(sight.id) },
                 onBack = { navController.popBackStack() }
             )
+        }
+        composable(CelNavDestinations.CELESTIAL_BODY_ROUTE) {
+            CelestialBodyScreen(onBack = {navController.popBackStack()})
         }
         composable(CelNavDestinations.SIGHT_DETAIL_ROUTE) {
             //TaskDetailScreen(

@@ -2,10 +2,12 @@ package com.jeffrwatts.celestialnavigation
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.jeffrwatts.celestialnavigation.CelNavDestinations.CELESTIAL_BODY_ROUTE
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.TITLE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.CelNavScreens.ADD_EDIT_SIGHT_SCREEN
+import com.jeffrwatts.celestialnavigation.CelNavScreens.CELESTIAL_BODY_SCREEN
 import com.jeffrwatts.celestialnavigation.CelNavScreens.SIGHTS_SCREEN
 import com.jeffrwatts.celestialnavigation.CelNavScreens.PLOT_SCREEN
 import com.jeffrwatts.celestialnavigation.CelNavScreens.SIGHT_DETAIL_SCREEN
@@ -18,6 +20,7 @@ private object CelNavScreens {
     const val PLOT_SCREEN = "plot"
     const val SIGHT_DETAIL_SCREEN = "sight"
     const val ADD_EDIT_SIGHT_SCREEN = "addEditSight"
+    const val CELESTIAL_BODY_SCREEN = "celestialBody"
 }
 
 /**
@@ -37,6 +40,7 @@ object CelNavDestinations {
     const val PLOT_ROUTE = PLOT_SCREEN
     const val SIGHT_DETAIL_ROUTE = "$SIGHT_DETAIL_SCREEN/{$SIGHT_ID_ARG}"
     const val ADD_EDIT_SIGHT_ROUTE = "$ADD_EDIT_SIGHT_SCREEN/{$TITLE_ARG}?$SIGHT_ID_ARG={$SIGHT_ID_ARG}"
+    const val CELESTIAL_BODY_ROUTE = CELESTIAL_BODY_SCREEN
 }
 
 /**
@@ -85,5 +89,9 @@ class AppNavigationActions(private val navController: NavHostController) {
                 if (taskId != null) "$it?$SIGHT_ID_ARG=$taskId" else it
             }
         )
+    }
+
+    fun navigateToCelestialBodies() {
+        navController.navigate(CELESTIAL_BODY_ROUTE)
     }
 }

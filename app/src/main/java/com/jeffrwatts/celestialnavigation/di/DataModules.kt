@@ -52,6 +52,13 @@ object RepositoryModule {
     ): GeoPositionRepository {
         return DefaultGeoPositionRepository(remoteDataSource, ioDispatcher)
     }
+
+    @Singleton
+    @Provides
+    fun provideSightPrefsRepository(@ApplicationContext context: Context)
+    : SightPrefsRepository {
+        return DefaultSightPrefsRepository(context)
+    }
 }
 
 @Module

@@ -1,6 +1,5 @@
 package com.jeffrwatts.celestialnavigation.addeditsight
 
-import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,8 +9,8 @@ import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.data.Result.Success
 import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.data.source.GeoPositionRepository
+import com.jeffrwatts.celestialnavigation.data.source.SightPrefsRepository
 import com.jeffrwatts.celestialnavigation.data.source.SightsRepository
-import com.jeffrwatts.celestialnavigation.data.succeeded
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 data class AddEditSightUiState(
@@ -68,6 +66,7 @@ data class AddEditSightUiState(
 class AddEditSightViewModel @Inject constructor (
     private val sightsRepository: SightsRepository,
     private val geoPositionRepository: GeoPositionRepository,
+    private val sightPrefsRepository: SightPrefsRepository,
     savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val sightId: String? = savedStateHandle[CelNavDestinationsArgs.SIGHT_ID_ARG]
@@ -82,12 +81,11 @@ class AddEditSightViewModel @Inject constructor (
         if (sightId != null) {
             loadSight(sightId)
         }
-
-        // TODO Read from Prefs for AP, IC, and EyeHeight.
-        setIc(-1.0)
-        setEyeHeight(16)
-        setLat(CelNavUtils.konaLat)
-        setLon(CelNavUtils.konaLon)
+        setIc(sightPrefsRepository.getIC())
+        setEyeHeight(sightPrefsRepository.getEyeHeight())
+        val assumedPosition = sightPrefsRepository.getAssumedPosition()
+        setLat(assumedPosition.latitude)
+        setLon(assumedPosition.longitude)
     }
 
     fun getGeoPosition(celestialBody: String) {
@@ -146,6 +144,7 @@ class AddEditSightViewModel @Inject constructor (
         _uiState.update {
             it.copy(ic = ic)
         }
+        sightPrefsRepository.setIC(ic)
         doSightReduction()
     }
 
@@ -154,6 +153,7 @@ class AddEditSightViewModel @Inject constructor (
         _uiState.update {
             it.copy(eyeHeight = eyeHeight, dip = dip)
         }
+        sightPrefsRepository.setEyeHeight(eyeHeight)
         doSightReduction()
     }
 

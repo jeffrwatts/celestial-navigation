@@ -1,5 +1,6 @@
 package com.jeffrwatts.celestialnavigation.plotting
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -11,6 +12,7 @@ import com.jeffrwatts.celestialnavigation.utils.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.jeffrwatts.celestialnavigation.data.Result
+import com.jeffrwatts.celestialnavigation.data.source.SightPrefsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -53,13 +55,18 @@ data class PlotUiState(
 
 @HiltViewModel
 class PlotViewModel @Inject constructor(
-    private val sightsRepository: SightsRepository
+    private val sightsRepository: SightsRepository,
+    private val sightPrefsRepository: SightPrefsRepository
 ) : ViewModel() {
+    private val _assumedPosition: MutableStateFlow<LatLng?>
 
+    init {
+        val assumedPosition = sightPrefsRepository.getAssumedPosition()
+        val hasAssumedPosition = !((assumedPosition.latitude == 0.0) and (assumedPosition.longitude == 0.0))
+        _assumedPosition = MutableStateFlow(if (hasAssumedPosition) assumedPosition else null)
+    }
 
     private val _fix: MutableStateFlow<LatLng?> = MutableStateFlow(null)
-    private val _assumedPosition: MutableStateFlow<LatLng?> = MutableStateFlow(null)
-
     private val _activeSightsAsync = sightsRepository.getSightsStream()
         .map { Async.Success(filterSights(if(it is Result.Success) it.data else emptyList())) }
         .onStart<Async<List<Sight>>> { emit(Async.Loading) }
@@ -97,6 +104,7 @@ class PlotViewModel @Inject constructor(
 
     fun setAssumedPosition(assumedPosition: LatLng) {
         _assumedPosition.value = assumedPosition
+        sightPrefsRepository.setAssumedPosition(assumedPosition)
     }
 
     fun clearAllSights () {

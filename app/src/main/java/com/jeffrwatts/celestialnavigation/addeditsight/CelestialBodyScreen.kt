@@ -61,7 +61,7 @@ fun CelestialBodyScreen(
                 }
             }
 
-            PullRefreshIndicator(uiState.isRefreshing, state, Modifier.align(Alignment.TopCenter))
+            PullRefreshIndicator(uiState.isRefreshing, state, Modifier.padding(paddingValues).align(Alignment.TopCenter))
         }
     }
 }

@@ -57,8 +57,7 @@ data class PlotUiState(
 @HiltViewModel
 class PlotViewModel @Inject constructor(
     private val sightsRepository: SightsRepository,
-    private val sightPrefsRepository: SightPrefsRepository,
-    private val celestialBodyRepository: CelestialBodyRepository
+    private val sightPrefsRepository: SightPrefsRepository
 ) : ViewModel() {
     private val _assumedPosition: MutableStateFlow<LatLng?>
 
@@ -99,13 +98,6 @@ class PlotViewModel @Inject constructor(
             started = WhileUiSubscribed,
             initialValue = PlotUiState(isLoading = true)
         )
-
-    fun loadDB() {
-        viewModelScope.launch {
-            // TEMP populate the DB.
-            celestialBodyRepository.getCelestialBodies(true)
-        }
-    }
 
     fun setFix(fix: LatLng) {
         _fix.value = fix

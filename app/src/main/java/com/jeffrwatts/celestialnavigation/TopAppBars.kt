@@ -20,12 +20,11 @@ import androidx.compose.ui.res.stringResource
 @Composable
 fun PlotTopAppBar(
     onEditSights: () -> Unit,
-    onClearSights: () -> Unit,
-    onLoadDB: () -> Unit) {
+    onClearSights: () -> Unit) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
-            MoreMenu(onEditSights, onClearSights, onLoadDB)
+            MoreMenu(onEditSights, onClearSights)
         },
         modifier = Modifier.fillMaxWidth()
     )
@@ -65,8 +64,7 @@ fun CelestialBodyTopAppBar(
 @Composable
 private fun MoreMenu(
     onEditSights: () -> Unit,
-    onClearSights: () -> Unit,
-    onLoadDB: () -> Unit
+    onClearSights: () -> Unit
 ) {
     TopAppBarDropdownMenu(
         iconContent = {
@@ -79,9 +77,6 @@ private fun MoreMenu(
         DropdownMenuItem(
             text = { Text(text = stringResource(id = R.string.clear_sights)) },
             onClick = { onClearSights(); closeMenu() })
-        DropdownMenuItem(
-            text = {Text(text = stringResource(id = R.string.load_db))},
-            onClick = { onLoadDB(); closeMenu() })
     }
 }
 

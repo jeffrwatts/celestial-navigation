@@ -24,14 +24,12 @@ class CelestialBodyRemoteDataSource internal constructor(
 
     override fun getCelestialBodiesStream(): Flow<Result<List<CelestialBody>>> {
         // Not sure if Flow makes sense from remote.. it is not called.
-        return MutableStateFlow(Result.Success(emptyList<CelestialBody>()))
+        return MutableStateFlow(Result.Success(emptyList()))
     }
 
     override suspend fun getCelestialBodies(): Result<List<CelestialBody>> {
-        Log.d("CelestialBodyRemoteDataSource", "START getCelestialBodies()")
-        delay(10000) // Simulate network call.
+        delay(5000) // Simulate network call.
         val celestialBodies = loadFromAssets()
-        Log.d("CelestialBodyRemoteDataSource", "RETURN getCelestialBodies() DONE")
         return Result.Success(celestialBodies)
     }
 

@@ -49,8 +49,7 @@ fun PlotScreen(
         topBar = {
             PlotTopAppBar(
                 onEditSights = { onEditSights() },
-                onClearSights = viewModel::clearAllSights,
-                onLoadDB = viewModel::loadDB)
+                onClearSights = viewModel::clearAllSights)
         },
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {

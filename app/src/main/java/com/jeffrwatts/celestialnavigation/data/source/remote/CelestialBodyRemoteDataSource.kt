@@ -1,24 +1,16 @@
 package com.jeffrwatts.celestialnavigation.data.source.remote
 
-import android.content.Context
-import android.os.Build
-import android.util.Log
+
 import com.jeffrwatts.celestialnavigation.data.CelestialBody
 import com.jeffrwatts.celestialnavigation.data.source.CelestialBodyDataSource
 import com.jeffrwatts.celestialnavigation.data.Result
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
+import com.jeffrwatts.celestialnavigation.network.CelestialBodyDataApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.lang.reflect.Type
-import java.nio.charset.StandardCharsets
-
 
 class CelestialBodyRemoteDataSource internal constructor(
-    private val context: Context,
+    private val celestialBodyDataApi: CelestialBodyDataApi,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CelestialBodyDataSource {
 
@@ -28,9 +20,15 @@ class CelestialBodyRemoteDataSource internal constructor(
     }
 
     override suspend fun getCelestialBodies(): Result<List<CelestialBody>> {
-        delay(5000) // Simulate network call.
-        val celestialBodies = loadFromAssets()
-        return Result.Success(celestialBodies)
+        return withContext(ioDispatcher) {
+            try {
+                // TODO: Don't hardcode position.
+                val currentTime = System.currentTimeMillis().toDouble() / 1000.0
+                Result.Success(celestialBodyDataApi.getCelestialObjData(19.6419, -155.9962, currentTime, 3))
+            } catch (exception: Exception) {
+                Result.Error(exception)
+            }
+        }
     }
 
     override suspend fun saveCelestialBody(body: CelestialBody) {
@@ -41,6 +39,7 @@ class CelestialBodyRemoteDataSource internal constructor(
         // NO-OP
     }
 
+    /*
     private fun loadFromAssets():List<CelestialBody> {
         try {
             val inputsStream = context.assets.open("celestialbodies.json")
@@ -58,7 +57,7 @@ class CelestialBodyRemoteDataSource internal constructor(
             Log.e("TAG", "Error", e)
             return emptyList()
         }
-    }
+    }*/
 }
 
 

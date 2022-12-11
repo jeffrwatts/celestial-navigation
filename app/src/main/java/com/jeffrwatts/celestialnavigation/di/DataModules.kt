@@ -10,6 +10,7 @@ import com.jeffrwatts.celestialnavigation.data.source.local.SightsDatabase
 import com.jeffrwatts.celestialnavigation.data.source.local.SightsLocalDataSource
 import com.jeffrwatts.celestialnavigation.data.source.remote.CelestialBodyRemoteDataSource
 import com.jeffrwatts.celestialnavigation.data.source.remote.GeoPositionRemoteDataSource
+import com.jeffrwatts.celestialnavigation.network.CelestialBodyDataApi
 import com.jeffrwatts.celestialnavigation.network.GeoPositionApi
 import dagger.Module
 import dagger.Provides
@@ -17,10 +18,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -105,10 +109,10 @@ object DataSourceModule {
     @RemoteCelestialBodyDataSource
     @Provides
     fun provideCelestialBodyRemoteDataSource(
-        @ApplicationContext context: Context,
+        api: CelestialBodyDataApi,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): CelestialBodyDataSource {
-        return CelestialBodyRemoteDataSource(context, ioDispatcher)
+        return CelestialBodyRemoteDataSource(api, ioDispatcher)
     }
 
     @Singleton
@@ -152,10 +156,32 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideGeoPositionApi(@ApplicationContext context: Context): GeoPositionApi {
+        val okHttpClient = OkHttpClient.Builder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .build()
+
         val retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.GEOPOSITION_URL)
+            .baseUrl(BuildConfig.GEO_POSITION_URL)
             .addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient)
             .build()
         return retrofit.create(GeoPositionApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCelestialBodyApi(@ApplicationContext context: Context): CelestialBodyDataApi {
+        val okHttpClient = OkHttpClient.Builder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BuildConfig.CELESTIAL_OBJ_DATA_URL)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+        return retrofit.create(CelestialBodyDataApi::class.java)
     }
 }

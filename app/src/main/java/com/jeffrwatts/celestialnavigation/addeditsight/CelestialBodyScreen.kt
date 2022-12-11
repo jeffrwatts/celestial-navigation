@@ -6,16 +6,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,6 +32,8 @@ import com.jeffrwatts.celestialnavigation.data.CelestialBody
 import com.jeffrwatts.celestialnavigation.data.CelestialObjectBodyType
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class,
     ExperimentalMaterialApi::class
@@ -46,21 +46,22 @@ fun CelestialBodyScreen(
     viewModel: CelestialBodyViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val state = rememberPullRefreshState(refreshing = uiState.isRefreshing, onRefresh = { viewModel.refresh() })
+    val state = rememberPullRefreshState(uiState.isRefreshing, viewModel::refresh)
 
     Scaffold(
         topBar = { CelestialBodyTopAppBar(onBack) },
         modifier = modifier.fillMaxSize())
     { paddingValues ->
         Box(Modifier.pullRefresh(state)) {
-
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
-                items(uiState.items) { celestialBody ->
-                    CelestialBodyRow(celestialBody = celestialBody, onClick)
+            LazyColumn(Modifier.padding(paddingValues).fillMaxSize()) {
+                if (!uiState.isRefreshing) {
+                    items(uiState.items) {
+                        CelestialBodyRow(it, onClick)
+                    }
                 }
             }
-            PullRefreshIndicator(refreshing = uiState.isRefreshing, state = state, Modifier.align(Alignment.TopCenter))
+
+            PullRefreshIndicator(uiState.isRefreshing, state, Modifier.align(Alignment.TopCenter))
         }
     }
 }
@@ -81,22 +82,6 @@ fun displayHours (angle: Double, positiveSign: String?=null, negativeSign: Strin
         display += if (sign == 1) "$positiveSign" else "$negativeSign"
     }
     return display
-}
-
-@Composable
-private fun EmptyContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.sextant),
-            contentDescription = stringResource(R.string.no_bodies),
-            modifier = Modifier.size(96.dp)
-        )
-        Text(stringResource(id = R.string.no_bodies))
-    }
 }
 
 @Composable

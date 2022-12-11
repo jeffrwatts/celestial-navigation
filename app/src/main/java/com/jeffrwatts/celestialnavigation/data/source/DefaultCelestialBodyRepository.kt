@@ -1,5 +1,6 @@
 package com.jeffrwatts.celestialnavigation.data.source
 
+import android.util.Log
 import com.jeffrwatts.celestialnavigation.data.CelestialBody
 import com.jeffrwatts.celestialnavigation.data.Result
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,6 +17,7 @@ class DefaultCelestialBodyRepository (
     }
 
     override suspend fun getCelestialBodies(forceUpdate: Boolean): Result<List<CelestialBody>> {
+        Log.d("DefaultCelestialBodyRepository", "START getCelestialBodies: forceUpdate=:$forceUpdate")
         if (forceUpdate) {
             try {
                 updateBodiesFromRemoteDataSource()
@@ -23,6 +25,7 @@ class DefaultCelestialBodyRepository (
                 return Result.Error(ex)
             }
         }
+        Log.d("DefaultCelestialBodyRepository", "RETURN getCelestialBodies: forceUpdate=:$forceUpdate")
         return celestialBodyLocalDataSource.getCelestialBodies()
     }
 

@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.jeffrwatts.celestialnavigation.R
+import com.jeffrwatts.celestialnavigation.data.CelestialBody
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
 import kotlin.math.pow
 
@@ -210,39 +212,11 @@ fun Intercept (intercept: Double, direction: CelNavUtils.LOPDirection) {
 }
 
 @Composable
-fun CelestialBodyDropDown(
-    onGetSight: (selected: String)->Unit
-) {
-    var selected by remember { mutableStateOf("None") }
-    var expanded by remember { mutableStateOf(false) }
-    val listItems = stringArrayResource(R.array.celestial_bodies)
-
+fun CelestialBody(celestialBody: String, onGetSight: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text = "Sight: ", style = Typography.titleLarge)
-        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = selected, style = Typography.titleLarge)
-                IconButton(onClick = { expanded = !expanded }) {
-                    Icon(Icons.Filled.ArrowDropDown, stringResource(id = R.string.app_name))
-                }
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.wrapContentSize(Alignment.TopEnd)
-            ) {
-                listItems.forEach { itemValue ->
-                    DropdownMenuItem(text = { Text(text = itemValue, style = Typography.bodyLarge) },
-                        onClick = {
-                            selected = itemValue
-                            expanded = false
-                        })
-                    Divider()
-                }
-            }
-        }
-        Button(onClick = { onGetSight(selected) }, enabled = (selected != "None")) {
+        Text(text = celestialBody, style = Typography.titleLarge)
+        Button(onClick = { onGetSight() }, modifier = Modifier.padding(horizontal = 20.dp)) {
             Text("Get GP")
         }
     }

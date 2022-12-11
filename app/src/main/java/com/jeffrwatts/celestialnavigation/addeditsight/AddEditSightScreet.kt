@@ -25,7 +25,7 @@ import com.jeffrwatts.celestialnavigation.utils.*
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
 @Composable
 fun AddEditSightScreen(
-    @StringRes topBarTitle: Int,
+    celestialBodyName: String,
     onSightUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -34,7 +34,7 @@ fun AddEditSightScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { AddEditSightTopAppBar(topBarTitle, onBack) },
+        topBar = { AddEditSightTopAppBar(R.string.add_sight, onBack) },
         floatingActionButton = {
             FloatingActionButton(onClick = viewModel::saveSight) {
                 Icon(Icons.Filled.Done, stringResource(id = R.string.save_sight))
@@ -77,7 +77,7 @@ fun AddEditSightScreen(
 @Composable
 private fun AddEditSightContent(
     uiState: AddEditSightUiState,
-    onGetGeographicalPosition: (celestialBody: String)->Unit,
+    onGetGeographicalPosition: ()->Unit,
     onHsChanged: (newHs: Double)->Unit,
     onIcChanged: (newIc: Double)->Unit,
     onEyeHeightChanged: (newEyeHeight: Int)->Unit,
@@ -100,7 +100,7 @@ private fun AddEditSightContent(
                 .padding(all = dimensionResource(id = R.dimen.horizontal_margin))
                 .verticalScroll(rememberScrollState())
         ) {
-            CelestialBodyDropDown ( onGetGeographicalPosition )
+            CelestialBody ( uiState.celestialBody, onGetGeographicalPosition )
             UTC(uiState.utc)
             AngleDisplay(label = "GHA:", angle = uiState.gha)
             Dec(angle = uiState.dec)

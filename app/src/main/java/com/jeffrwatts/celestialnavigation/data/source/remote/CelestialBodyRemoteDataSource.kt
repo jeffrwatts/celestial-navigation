@@ -22,15 +22,16 @@ class CelestialBodyRemoteDataSource internal constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CelestialBodyDataSource {
 
-    private val observableBodies = MutableStateFlow(initializeList())
-
     override fun getCelestialBodiesStream(): Flow<Result<List<CelestialBody>>> {
-        return observableBodies
+        // Not sure if Flow makes sense from remote.. it is not called.
+        return MutableStateFlow(Result.Success(emptyList<CelestialBody>()))
     }
 
     override suspend fun getCelestialBodies(): Result<List<CelestialBody>> {
+        Log.d("CelestialBodyRemoteDataSource", "START getCelestialBodies()")
+        delay(10000) // Simulate network call.
         val celestialBodies = loadFromAssets()
-        //delay(5000) // Simulate network call.
+        Log.d("CelestialBodyRemoteDataSource", "RETURN getCelestialBodies() DONE")
         return Result.Success(celestialBodies)
     }
 
@@ -40,10 +41,6 @@ class CelestialBodyRemoteDataSource internal constructor(
 
     override suspend fun deleteAllCelestialBodies() {
         // NO-OP
-    }
-
-    private fun initializeList():Result<List<CelestialBody>> {
-        return Result.Success(emptyList())
     }
 
     private fun loadFromAssets():List<CelestialBody> {

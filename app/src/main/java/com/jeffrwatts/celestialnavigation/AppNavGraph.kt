@@ -17,8 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.SIGHT_ID_ARG
-import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.TITLE_ARG
+import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.CELESTIAL_BODY_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
 import com.jeffrwatts.celestialnavigation.addeditsight.CelestialBodyScreen
@@ -50,18 +49,17 @@ fun AppNavGraph(
         composable(
             CelNavDestinations.PLOT_ROUTE) {
             PlotScreen(
-                onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                onEditSights = { navActions.navigateToCelestialBodies() })
+                onAddSight = { navActions.navigateToCelestialBodies() },
+                onEditSights = { navActions.navigateToSights() })
         }
         composable(
             CelNavDestinations.ADD_EDIT_SIGHT_ROUTE,
             arguments = listOf(
-                navArgument(TITLE_ARG) { type = NavType.IntType },
-                navArgument(SIGHT_ID_ARG) { type = NavType.StringType; nullable = true },
+                navArgument(CELESTIAL_BODY_ARG) { type = NavType.StringType }
             )
         ) { entry ->
             AddEditSightScreen(
-                topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
+                celestialBodyName = entry.arguments?.getString(CELESTIAL_BODY_ARG)!!,
                 onSightUpdate = { navActions.navigateToPlot() },
                 onBack = { navController.popBackStack() }
             )
@@ -75,22 +73,14 @@ fun AppNavGraph(
             SightsScreen(
                 userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
                 onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
-                onAddSight = { navActions.navigateToAddEditSight(R.string.add_sight, null) },
-                onSightClick = { sight -> navActions.navigateToSightDetail(sight.id) },
+                onAddSight = { navActions.navigateToCelestialBodies() },
+                onSightClick = {  },
                 onBack = { navController.popBackStack() }
             )
         }
         composable(CelNavDestinations.CELESTIAL_BODY_ROUTE) {
-            CelestialBodyScreen(onBack = {navController.popBackStack()})
-        }
-        composable(CelNavDestinations.SIGHT_DETAIL_ROUTE) {
-            //TaskDetailScreen(
-            //    onEditTask = { sightId ->
-            //        navActions.navigateToAddEditSight(R.string.edit_sight, sightId)
-            //    },
-            //    onBack = { navController.popBackStack() },
-            //    onDeleteTask = { navActions.navigateToSights(DELETE_RESULT_OK) }
-            //)
+            CelestialBodyScreen(onBack = {navController.popBackStack()},
+                onClick = { celestialBody -> navActions.navigateToAddEditSight(celestialBody) })
         }
     }
 }

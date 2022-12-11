@@ -69,7 +69,7 @@ class AddEditSightViewModel @Inject constructor (
     private val sightPrefsRepository: SightPrefsRepository,
     savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val sightId: String? = savedStateHandle[CelNavDestinationsArgs.SIGHT_ID_ARG]
+    private val celestialBody: String? = savedStateHandle[CelNavDestinationsArgs.CELESTIAL_BODY_ARG]
 
     // A MutableStateFlow needs to be created in this ViewModel. The source of truth of the current
     // editable Task is the ViewModel, we need to mutate the UI state directly in methods such as
@@ -78,9 +78,10 @@ class AddEditSightViewModel @Inject constructor (
     val uiState: StateFlow<AddEditSightUiState> = _uiState.asStateFlow()
 
     init {
-        if (sightId != null) {
-            loadSight(sightId)
+        celestialBody?.let {
+            setCelestialBody(it)
         }
+
         setIc(sightPrefsRepository.getIC())
         setEyeHeight(sightPrefsRepository.getEyeHeight())
         val assumedPosition = sightPrefsRepository.getAssumedPosition()
@@ -88,10 +89,10 @@ class AddEditSightViewModel @Inject constructor (
         setLon(assumedPosition.longitude)
     }
 
-    fun getGeoPosition(celestialBody: String) {
+    fun getGeoPosition() {
         val currentTime = System.currentTimeMillis().toDouble() / 1000.0
         viewModelScope.launch {
-            when (val geoPositionResult = geoPositionRepository.getGeoPosition(celestialBody, currentTime)) {
+            when (val geoPositionResult = geoPositionRepository.getGeoPosition(uiState.value.celestialBody, currentTime)) {
                 is Success -> {
                     val equitorialRadius = when(geoPositionResult.data.body) {
                         "Sun" -> CelNavUtils.equatorialRadiusSun
@@ -116,6 +117,12 @@ class AddEditSightViewModel @Inject constructor (
                     }
                 }
             }
+        }
+    }
+
+    fun setCelestialBody(celestialBody: String) {
+        _uiState.update {
+            it.copy(celestialBody = celestialBody)
         }
     }
 
@@ -171,12 +178,7 @@ class AddEditSightViewModel @Inject constructor (
             }
             return
         }
-
-        if (sightId == null) {
-            createNewSight()
-        } else {
-            updateSight()
-        }
+        createNewSight()
     }
 
     fun snackbarMessageShown() {
@@ -254,85 +256,6 @@ class AddEditSightViewModel @Inject constructor (
         sightsRepository.saveSight(newSight)
         _uiState.update {
             it.copy(isSightSaved = true)
-        }
-    }
-
-    private fun updateSight() {
-        if (sightId == null) {
-            throw RuntimeException("updateTask() was called but task is new.")
-        }
-        viewModelScope.launch {
-            val updatedSight = Sight(
-                celestialBody = uiState.value.celestialBody,
-                utc = uiState.value.utc,
-                distance = uiState.value.distance,
-                equitorialRadius = uiState.value.equitorialRadius,
-                gha = uiState.value.gha,
-                dec = uiState.value.dec,
-                lat = uiState.value.lat,
-                lon = uiState.value.lon,
-                Hs = uiState.value.Hs,
-                ic = uiState.value.ic,
-                eyeHeight = uiState.value.eyeHeight,
-                limb = uiState.value.limb,
-                dip = uiState.value.dip,
-                refraction = uiState.value.refraction,
-                SD = uiState.value.SD,
-                HP = uiState.value.HP,
-                Ho = uiState.value.Ho,
-                lha = uiState.value.lha,
-                Hc = uiState.value.Hc,
-                Zn = uiState.value.Zn,
-                lopDirection = uiState.value.lopDirection,
-                intercept = uiState.value.intercept)
-            sightsRepository.saveSight(updatedSight)
-            _uiState.update {
-                it.copy(isSightSaved = true)
-            }
-        }
-    }
-
-    private fun loadSight(sightId: String) {
-        _uiState.update {
-            it.copy(isLoading = true)
-        }
-        viewModelScope.launch {
-            sightsRepository.getSight(sightId).let { result ->
-                if (result is Success) {
-                    val sight = result.data
-                    _uiState.update {
-                        it.copy(
-                            celestialBody = sight.celestialBody,
-                            utc = sight.utc,
-                            distance = sight.distance,
-                            equitorialRadius = sight.equitorialRadius,
-                            gha = sight.gha,
-                            dec = sight.dec,
-                            lat = sight.lat,
-                            lon = sight.lon,
-                            Hs = sight.Hs,
-                            ic = sight.ic,
-                            limb = sight.limb,
-                            eyeHeight = sight.eyeHeight,
-                            dip = sight.dip,
-                            refraction = sight.refraction,
-                            SD = sight.SD,
-                            HP = sight.HP,
-                            Ho = sight.Ho,
-                            lha = sight.lha,
-                            Hc = sight.Hc,
-                            Zn = sight.Zn,
-                            lopDirection = sight.lopDirection,
-                            intercept = sight.intercept,
-                            isLoading = false
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(isLoading = false)
-                    }
-                }
-            }
         }
     }
 }

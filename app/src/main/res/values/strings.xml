@@ -30,6 +30,7 @@
     <string name="celestial_body">Celestial Bodies</string>
     <string name="populate_db">Load DB</string>
     <string name="load_db">Load DB</string>
+    <string name="no_bodies">No objects (Pull to refresh)</string>
 
     <string-array name="celestial_bodies">
         <item>Sun</item>

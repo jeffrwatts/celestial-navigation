@@ -26,7 +26,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-        buildConfigField 'String', 'SERVER_URL', properties.getProperty('SERVER_URL', '"https://example.com/"')
+        buildConfigField 'String', 'GEOPOSITION_URL', properties.getProperty('GEOPOSITION_URL', '"https://example.com/"')
     }
 
     buildTypes {

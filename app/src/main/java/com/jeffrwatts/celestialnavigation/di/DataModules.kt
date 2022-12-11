@@ -153,7 +153,7 @@ object NetworkModule {
     @Provides
     fun provideGeoPositionApi(@ApplicationContext context: Context): GeoPositionApi {
         val retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVER_URL)
+            .baseUrl(BuildConfig.GEOPOSITION_URL)
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
         return retrofit.create(GeoPositionApi::class.java)

@@ -1,12 +1,10 @@
 package com.jeffrwatts.celestialnavigation.addeditsight
 
-import android.text.format.DateFormat
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -17,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,11 +26,8 @@ import com.jeffrwatts.celestialnavigation.CelestialBodyTopAppBar
 import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.data.CelestialBody
 import com.jeffrwatts.celestialnavigation.data.CelestialObjectBodyType
-import com.jeffrwatts.celestialnavigation.data.RiseSet
-import com.jeffrwatts.celestialnavigation.data.RiseSetType
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class,
     ExperimentalMaterialApi::class
@@ -56,8 +52,8 @@ fun CelestialBodyScreen(
                     .padding(paddingValues)
                     .fillMaxSize()) {
                 if (!uiState.isRefreshing) {
-                    items(uiState.items) {
-                        CelestialBodyRow(it, onClick)
+                    itemsIndexed(uiState.items) { index, item ->
+                        CelestialBodyRow(item, uiState.itemsVisibility[index], onClick)
                     }
                 }
             }
@@ -70,7 +66,7 @@ fun CelestialBodyScreen(
     }
 }
 
-fun displayDec (angle: Double, positiveSign: String?=null, negativeSign: String?=null): String {
+fun displayDegrees (angle: Double, positiveSign: String?=null, negativeSign: String?=null): String {
     val (deg, min, sign) = CelNavUtils.degreesMinutesSign(angle)
     var display = "${deg}° ${min}'"
     if (!positiveSign.isNullOrEmpty() and !negativeSign.isNullOrEmpty()) {
@@ -89,7 +85,7 @@ fun displayHours (angle: Double, positiveSign: String?=null, negativeSign: Strin
 }
 
 @Composable
-fun CelestialBodyRow(celestialBody: CelestialBody, onClick: (celestialBody: CelestialBody) -> Unit) {
+fun CelestialBodyRow(celestialBody: CelestialBody, visibility: CelestialBodyVisibilty, onClick: (celestialBody: CelestialBody) -> Unit) {
     val imageResource = when(celestialBody.objtype) {
         CelestialObjectBodyType.Sun -> R.drawable.sun
         CelestialObjectBodyType.Moon -> R.drawable.moon
@@ -114,10 +110,33 @@ fun CelestialBodyRow(celestialBody: CelestialBody, onClick: (celestialBody: Cele
                     .padding(4.dp))
                 Column() {
                     Text(text = celestialBody.name, style = Typography.bodyLarge, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(4.dp))
-                    Text(text = "RA: ${displayHours(celestialBody.ra)}", style = Typography.bodyLarge)
-                    Text(text = "dec: ${displayDec(celestialBody.dec)}", style = Typography.bodyLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "RA: ", style = Typography.bodyLarge)
+                        Text(text = displayHours(celestialBody.ra), style = Typography.bodyLarge)
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val (degrees, minutes, sign) = CelNavUtils.degreesMinutesSign(celestialBody.dec)
+                        Text(text = "dec:", style = Typography.bodyLarge)
+                        Text(text = if (sign > 0) "N" else "S", style = Typography.bodyLarge)
+                        Text(text = degrees.toString(), style = Typography.bodyLarge)
+                        Text(text = "°", style = Typography.bodyLarge)
+                        Text(text = minutes.toString(), style = Typography.bodyLarge)
+                        Text(text = "'", style = Typography.bodyLarge)
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "Visibility: ", style = Typography.bodyLarge)
+                        val (text, color) = when (visibility) {
+                            CelestialBodyVisibilty.AlwaysAboveHorizon -> Pair("Always Above Horizon", Color(0, 200, 0))
+                            CelestialBodyVisibilty.AlwaysBelowHorizon -> Pair("Always Below Horizon", Color(255, 0, 0))
+                            CelestialBodyVisibilty.AboveHorizon -> Pair("Above Horizon", Color(0, 200, 0))
+                            CelestialBodyVisibilty.BelowHorizon -> Pair("Below Horizon", Color(255, 0, 0))
+                            CelestialBodyVisibilty.OutOfDate -> Pair("Out Of Date", Color(255, 0, 0))
+                        }
+                        Text(text = text, style = Typography.bodyLarge, color = color)
+                    }
                 }
             }
+            /*
             Row() {
                 Column() {
                     celestialBody.riseset.forEach {
@@ -131,8 +150,8 @@ fun CelestialBodyRow(celestialBody: CelestialBody, onClick: (celestialBody: Cele
                         }
                     }
                 }
-
             }
+            */
         }
     }
 }

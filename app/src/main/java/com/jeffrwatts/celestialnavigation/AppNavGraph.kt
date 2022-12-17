@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.CELESTIAL_BODY_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
 import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
+import com.jeffrwatts.celestialnavigation.addeditsight.AddSightScreen
 import com.jeffrwatts.celestialnavigation.addeditsight.CelestialBodyScreen
 import com.jeffrwatts.celestialnavigation.plotting.PlotScreen
 import com.jeffrwatts.celestialnavigation.sights.SightsScreen
@@ -58,8 +59,7 @@ fun AppNavGraph(
                 navArgument(CELESTIAL_BODY_ARG) { type = NavType.StringType }
             )
         ) { entry ->
-            AddEditSightScreen(
-                celestialBodyName = entry.arguments?.getString(CELESTIAL_BODY_ARG)!!,
+            AddSightScreen(
                 onSightUpdate = { navActions.navigateToPlot() },
                 onBack = { navController.popBackStack() }
             )

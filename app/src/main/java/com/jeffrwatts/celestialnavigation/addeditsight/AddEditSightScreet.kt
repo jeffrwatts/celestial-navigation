@@ -25,7 +25,6 @@ import com.jeffrwatts.celestialnavigation.utils.*
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
 @Composable
 fun AddEditSightScreen(
-    celestialBodyName: String,
     onSightUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,

@@ -31,7 +31,7 @@ fun AddSightScreen(
     onSightUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AddEditSightViewModel = hiltViewModel(),
+    viewModel: AddSightViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ){
     Scaffold(
@@ -482,7 +482,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             end.linkTo(minutesGuide)
             centerVerticallyTo(lonLabelField)
         })
-        Text(if (latSign == 1) "E" else "W", style = Typography.bodyLarge, modifier = Modifier.constrainAs(lonSignField){
+        Text(if (lonSign == 1) "E" else "W", style = Typography.bodyLarge, modifier = Modifier.constrainAs(lonSignField){
             start.linkTo(latMinutesField.end, 8.dp)
             centerVerticallyTo(lonLabelField)
         })

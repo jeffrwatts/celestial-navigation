@@ -63,7 +63,7 @@ data class AddEditSightUiState(
 )
 
 @HiltViewModel
-class AddEditSightViewModel @Inject constructor (
+class AddSightViewModel @Inject constructor (
     private val sightsRepository: SightsRepository,
     private val geoPositionRepository: GeoPositionRepository,
     private val sightPrefsRepository: SightPrefsRepository,

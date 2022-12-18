@@ -1,4 +1,4 @@
-package com.jeffrwatts.celestialnavigation.addeditsight
+package com.jeffrwatts.celestialnavigation.celestialbody
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

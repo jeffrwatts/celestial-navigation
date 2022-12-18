@@ -19,13 +19,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.CELESTIAL_BODY_ARG
 import com.jeffrwatts.celestialnavigation.CelNavDestinationsArgs.USER_MESSAGE_ARG
-import com.jeffrwatts.celestialnavigation.addeditsight.AddEditSightScreen
-import com.jeffrwatts.celestialnavigation.addeditsight.AddSightScreen
-import com.jeffrwatts.celestialnavigation.addeditsight.CelestialBodyScreen
+import com.jeffrwatts.celestialnavigation.addsight.AddSightScreen
+import com.jeffrwatts.celestialnavigation.celestialbody.CelestialBodyScreen
 import com.jeffrwatts.celestialnavigation.plotting.PlotScreen
 import com.jeffrwatts.celestialnavigation.sights.SightsScreen
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

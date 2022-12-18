@@ -1,6 +1,5 @@
-package com.jeffrwatts.celestialnavigation.addeditsight
+package com.jeffrwatts.celestialnavigation.addsight
 
-import android.widget.Scroller
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,20 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.offset
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintLayoutBaseScope
-import androidx.constraintlayout.compose.HorizontalAnchorable
-import androidx.constraintlayout.compose.VerticalAnchorable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,6 +88,31 @@ fun AddSightTopAppBar(@StringRes title: Int, onBack: () -> Unit) {
 
 val rowSpacer = 8.dp
 val inputRowSpacer = 32.dp
+
+fun intValid (intText: String, limit: Int? = null): Boolean {
+    if (intText.isEmpty()) return true
+    val int = intText.toIntOrNull() ?: return false
+    return if (limit != null) int <= limit else true
+}
+
+fun minutesValid (minutes: String): Boolean {
+    if (minutes.isEmpty()) return true
+    val minutesDouble = minutes.toDoubleOrNull() ?: return false
+    return minutesDouble < 60.0
+}
+
+fun computeIcMinutes (minutes: String, icDirection: CelNavUtils.ICDirection): Double {
+    val minutesDouble = if (minutes.isEmpty()) 0.0 else minutes.toDouble()
+    return if (icDirection == CelNavUtils.ICDirection.On) minutesDouble*-1 else minutesDouble
+}
+
+fun limbToDisplayName(limb: CelNavUtils.Limb): String {
+    return when (limb) {
+        CelNavUtils.Limb.Upper -> "Upper Limb"
+        CelNavUtils.Limb.Lower -> "Lower Limb"
+        CelNavUtils.Limb.Center -> "Center"
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -203,16 +218,9 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
         })
 
         // Hs
-        var initHs by remember { mutableStateOf(true) }
         var inputDegreesHs by remember { mutableStateOf("") }
         var inputMinutesHs by remember { mutableStateOf("") }
 
-        if (initHs) {
-            val (degrees, minutes, sign) = CelNavUtils.degreesMinutesSign(uiState.Hs)
-            inputDegreesHs = degrees.toString()
-            inputMinutesHs = minutes.toString()
-            initHs = false
-        }
         Text("Hs:", style = Typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.constrainAs(HsLabelField){
             top.linkTo(divider1.bottom, margin = inputRowSpacer)
             start.linkTo(labelGuide)
@@ -499,7 +507,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
         })
 
         // Zn
-        val (ZnDegrees, ZnMinutes, _) = CelNavUtils.degreesMinutesSign(uiState.Hc)
+        val (ZnDegrees, ZnMinutes, _) = CelNavUtils.degreesMinutesSign(uiState.Zn)
         Text("Zn:", style = Typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.constrainAs(ZnLabelField){
             top.linkTo(HcLabelField.bottom, margin = rowSpacer)
             start.linkTo(labelGuide)

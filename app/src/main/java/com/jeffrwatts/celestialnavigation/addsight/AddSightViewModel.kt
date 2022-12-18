@@ -1,4 +1,4 @@
-package com.jeffrwatts.celestialnavigation.addeditsight
+package com.jeffrwatts.celestialnavigation.addsight
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

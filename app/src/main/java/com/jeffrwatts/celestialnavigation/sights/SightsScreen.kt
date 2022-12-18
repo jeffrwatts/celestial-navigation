@@ -21,7 +21,6 @@ import com.jeffrwatts.celestialnavigation.data.Sight
 import com.jeffrwatts.celestialnavigation.R
 import com.jeffrwatts.celestialnavigation.SightsTopAppBar
 import com.jeffrwatts.celestialnavigation.ui.theme.Typography
-import com.jeffrwatts.celestialnavigation.utils.LoadingContent
 
 @OptIn(ExperimentalLifecycleComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -88,26 +87,18 @@ private fun SightsContent(
     onSightActivatedChange: (Sight, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LoadingContent(
-        loading = loading,
-        empty = sights.isEmpty() && !loading,
-        emptyContent = { SightsEmptyContent(modifier) },
-        onRefresh = {}
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
-        ) {
-            for (sight in sights)
-                SightItem(
-                    sight = sight,
-                    onSightClick = onSightClick,
-                    onCheckedChange = { onSightActivatedChange(sight, it) })
-        }
-        }
+        for (sight in sights)
+            SightItem(
+                sight = sight,
+                onSightClick = onSightClick,
+                onCheckedChange = { onSightActivatedChange(sight, it) })
     }
-
+}
 
 @Composable
 private fun SightItem(

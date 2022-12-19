@@ -210,7 +210,7 @@ class AddSightViewModel @Inject constructor (
         // Do Sight Reduction
         val (Hc, _, Zn) = CelNavUtils.calculateSightReduction(uiState.value.dec, uiState.value.lat, localHourAngle)
 
-        val intercept = CelNavUtils.roundToPrecision(abs(Ho - Hc)*60.0, 2)
+        val intercept = abs(Ho - Hc)*60.0
         val direction = if (Hc < Ho) CelNavUtils.LOPDirection.Towards else CelNavUtils.LOPDirection.Away
 
         _uiState.update {

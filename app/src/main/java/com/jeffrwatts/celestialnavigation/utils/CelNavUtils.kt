@@ -63,19 +63,18 @@ object CelNavUtils {
     }
 
     fun calculateDipCorrection (heightEyeFt: Int): Double {
-        return roundToPrecision(0.97 * sqrt(heightEyeFt.toDouble()), 1) * -1
+        return 0.97 * sqrt(heightEyeFt.toDouble()) * -1
     }
 
     fun calculateRefractionCorrection (Ha: Double): Double {
-        val refraction = 1.0 / tan(radians(Ha + (7.31/(Ha+4.4))))
-        return roundToPrecision(refraction, 1) * -1
+        return -1.0 / tan(radians(Ha + (7.31/(Ha+4.4))))
     }
 
     fun calculateSemiDiameterCorrection(Ha: Double, distance: Double, equatorialRadius: Double, limb: Limb): Double {
         if (limb == Limb.Center) return 0.0
 
         val sd = degrees(asin(equatorialRadius / distance))
-        var sdMinutes = roundToPrecision(sd * 60, 1)
+        var sdMinutes = sd*60
 
         if (limb == Limb.Upper) {
             sdMinutes *= -1.0
@@ -94,7 +93,7 @@ object CelNavUtils {
 
         // Calculate Horizontal Parallax in Altitude
         hp *= cos(radians(Ha))
-        return roundToPrecision(degrees(hp) * 60, 1)
+        return degrees(hp) * 60
     }
 
     fun calculateLocalHourAngle (GHA: Double, lon: Double): Double {

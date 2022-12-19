@@ -356,7 +356,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             start.linkTo(eyeHeightField.end, 16.dp)
             centerVerticallyTo(eyeHeightLabelField)
         })
-        Text("${uiState.dip} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(DIPField){
+        Text("${CelNavUtils.roundToPrecision(uiState.dip, 1)} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(DIPField){
             end.linkTo(minutesGuide)
             centerVerticallyTo(eyeHeightLabelField)
         })
@@ -405,7 +405,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             top.linkTo(limbLabelField.bottom, margin = rowSpacer)
             start.linkTo(labelGuide)
         })
-        Text("${uiState.refraction} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(refrField){
+        Text("${CelNavUtils.roundToPrecision(uiState.refraction,1)} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(refrField){
             end.linkTo(minutesGuide)
             centerVerticallyTo(refrLabelField)
         })
@@ -415,7 +415,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             top.linkTo(refrLabelField.bottom, margin = rowSpacer)
             start.linkTo(labelGuide)
         })
-        Text("${uiState.SD} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(SDField){
+        Text("${CelNavUtils.roundToPrecision(uiState.SD, 1)} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(SDField){
             end.linkTo(minutesGuide)
             centerVerticallyTo(SDLabelField)
         })
@@ -425,7 +425,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             top.linkTo(SDLabelField.bottom, margin = rowSpacer)
             start.linkTo(labelGuide)
         })
-        Text("${uiState.HP} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(HPField){
+        Text("${CelNavUtils.roundToPrecision(uiState.HP, 1)} '", style = Typography.bodyLarge, modifier = Modifier.constrainAs(HPField){
             end.linkTo(minutesGuide)
             centerVerticallyTo(HPLabelField)
         })
@@ -526,7 +526,7 @@ fun ConstraintLayoutContent(uiState: AddEditSightUiState,
             top.linkTo(ZnLabelField.bottom, margin = rowSpacer)
             start.linkTo(labelGuide)
         })
-        Text("${uiState.intercept} nm; ${if (uiState.lopDirection == CelNavUtils.LOPDirection.Away) "Away" else "Towards"}"
+        Text("${CelNavUtils.roundToPrecision(uiState.intercept, 2)} nm; ${if (uiState.lopDirection == CelNavUtils.LOPDirection.Away) "Away" else "Towards"}"
             , style = Typography.bodyLarge, modifier = Modifier.constrainAs(interceptField){
             start.linkTo(interceptLabelField.end, 60.dp)
             centerVerticallyTo(interceptLabelField)

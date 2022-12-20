@@ -1,15 +1,18 @@
 package com.jeffrwatts.celestialnavigation.data.source
 
+import com.jeffrwatts.celestialnavigation.AddSightTestData
 import com.jeffrwatts.celestialnavigation.data.GeoPosition
 import com.jeffrwatts.celestialnavigation.data.Result
 import com.jeffrwatts.celestialnavigation.utils.CelNavUtils
+import java.lang.Exception
 
-class FakeGeoPositionRepository : GeoPositionRepository {
+class FakeGeoPositionRepository (testData: List<AddSightTestData>) : GeoPositionRepository {
+    private val testDataMap = testData.map { it.test to it }.toMap()
 
     override suspend fun getGeoPosition(body: String, utc: Double): Result<GeoPosition> {
-        return Result.Success(GeoPosition("", "Sun",
-            CelNavUtils.angle(135, 49.1),
-            CelNavUtils.angle(23, 24.12, CelNavUtils.South),
-            147205487.77383572))
+        testDataMap.get(body)?.let {
+            return Result.Success(GeoPosition(it.utc, it.body, it.GHA, it.dec, it.distance))
+        }
+        return Result.Error(Exception())
     }
 }
